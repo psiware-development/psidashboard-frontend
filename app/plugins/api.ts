@@ -1,30 +1,21 @@
-// plugins/api.ts
 export default defineNuxtPlugin(() => {
-
-  const { handleExpiredSession } = useExpiredSessionHandler();
+  const authStore = useAuthStore()
+  const { handleExpiredSession } = useExpiredSessionHandler()
 
   const api = $fetch.create({
     baseURL: '/backend',
-    credentials: 'include',
     onRequest({ options }) {
-      // En SSR, las cookies del navegador no están disponibles automáticamente.
-      // Necesitamos pasar las cookies del request original al backend.
-      if (import.meta.server) {
-        const headers = useRequestHeaders(['cookie'])
-        if (headers.cookie) {
-          options.headers = {
-            ...options.headers,
-            cookie: headers.cookie
-          }
-        }
+      if (authStore.accessToken) {
+        const headers = new Headers(options.headers as HeadersInit | undefined)
+        headers.set('Authorization', `Bearer ${authStore.accessToken}`)
+        options.headers = headers
       }
     },
-    async onResponse({ response }) {
+    async onResponseError({ response }) {
       if (response.status === 401) {
-        handleExpiredSession();
+        await handleExpiredSession()
       }
     }
-
   })
 
   return {

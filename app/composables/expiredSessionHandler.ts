@@ -1,8 +1,18 @@
 export const useExpiredSessionHandler = () => {
-  const store = useAuthStore()
+  const authStore = useAuthStore()
+  const route = useRoute()
+
   const handleExpiredSession = async () => {
-    await store.logout()
-    navigateTo('/login')
+    if (route.path === '/login') {
+      return
+    }
+
+    authStore.logout()
+
+    await navigateTo({
+      path: '/login',
+      query: { expired: '1' }
+    })
   }
 
   return {
