@@ -63,24 +63,35 @@ const login = async () => {
         :title="error"
       />
 
-      <form class="space-y-5" @submit.prevent="login">
-        <UFormField label="Usuario" required>
+      <form
+        class="space-y-5"
+        @submit.prevent="login"
+      >
+        <UFormField
+          label="Usuario"
+          required
+        >
           <UInput
             v-model="username"
             size="lg"
             placeholder="Tu usuario"
             autocomplete="username"
+            class="w-full"
             :disabled="loading"
           />
         </UFormField>
 
-        <UFormField label="Contraseña" required>
+        <UFormField
+          label="Contraseña"
+          required
+        >
           <UInput
             v-model="password"
             type="password"
             size="lg"
             placeholder="••••••••"
             autocomplete="current-password"
+            class="w-full"
             :disabled="loading"
           />
         </UFormField>
@@ -96,7 +107,10 @@ const login = async () => {
 
       <p class="text-sm text-muted text-center">
         ¿No tenés cuenta?
-        <NuxtLink to="/register" class="text-primary hover:underline">
+        <NuxtLink
+          to="/register"
+          class="text-primary hover:underline"
+        >
           Registrarse
         </NuxtLink>
       </p>
