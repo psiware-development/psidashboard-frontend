@@ -8,7 +8,11 @@ export function canAccessUserResource(
     return false
   }
 
-  return currentUser.mainRole?.idRole === 8 || currentUser.idUser === Number(targetUserId)
+  return (
+    currentUser.mainRole?.idRole === 8
+    || currentUser.roleAdmin === true
+    || currentUser.idUser === Number(targetUserId)
+  )
 }
 
 export function canAccessUserResume(currentUser: User | null): boolean {
