@@ -55,8 +55,15 @@ const toggleCreationSort = () => {
     </div>
 
     <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
-      <div v-if="loading" class="p-4 space-y-2">
-        <USkeleton v-for="index in 5" :key="index" class="h-10" />
+      <div
+        v-if="loading"
+        class="p-4 space-y-2"
+      >
+        <USkeleton
+          v-for="index in 5"
+          :key="index"
+          class="h-10"
+        />
       </div>
 
       <UTable
@@ -75,7 +82,10 @@ const toggleCreationSort = () => {
           >
             {{ row.original.ref }}
           </a>
-          <span v-else class="whitespace-nowrap">{{ row.original.ref }}</span>
+          <span
+            v-else
+            class="whitespace-nowrap"
+          >{{ row.original.ref }}</span>
         </template>
 
         <template #projectName-cell="{ row }">
@@ -104,7 +114,10 @@ const toggleCreationSort = () => {
         </template>
       </UTable>
 
-      <p v-else class="p-4 text-sm text-muted text-center">
+      <p
+        v-else
+        class="p-4 text-sm text-muted text-center"
+      >
         No hay tareas en progreso.
       </p>
     </UCard>

@@ -20,8 +20,15 @@ const activeTab = ref('uss')
 <template>
   <section class="space-y-4">
     <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
-      <div v-if="loading" class="p-4 space-y-2">
-        <USkeleton v-for="index in 5" :key="index" class="h-10" />
+      <div
+        v-if="loading"
+        class="p-4 space-y-2"
+      >
+        <USkeleton
+          v-for="index in 5"
+          :key="index"
+          class="h-10"
+        />
       </div>
 
       <UTabs
@@ -37,7 +44,10 @@ const activeTab = ref('uss')
               v-if="userStories.length > 0"
               :rows="userStories"
             />
-            <p v-else class="p-4 text-sm text-muted text-center">
+            <p
+              v-else
+              class="p-4 text-sm text-muted text-center"
+            >
               No hay historias de usuario.
             </p>
           </div>
@@ -49,7 +59,10 @@ const activeTab = ref('uss')
               v-if="issues.length > 0"
               :rows="issues"
             />
-            <p v-else class="p-4 text-sm text-muted text-center">
+            <p
+              v-else
+              class="p-4 text-sm text-muted text-center"
+            >
               No hay issues.
             </p>
           </div>
@@ -61,7 +74,10 @@ const activeTab = ref('uss')
               v-if="tasks.length > 0"
               :rows="tasks"
             />
-            <p v-else class="p-4 text-sm text-muted text-center">
+            <p
+              v-else
+              class="p-4 text-sm text-muted text-center"
+            >
               No hay tareas declaradas.
             </p>
           </div>

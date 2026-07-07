@@ -15,7 +15,10 @@ const columns: TableColumn<ProjectIssueRow>[] = [
 </script>
 
 <template>
-  <UTable :data="rows" :columns="columns">
+  <UTable
+    :data="rows"
+    :columns="columns"
+  >
     <template #issue-cell="{ row }">
       <a
         v-if="row.original.link"
@@ -34,7 +37,10 @@ const columns: TableColumn<ProjectIssueRow>[] = [
     </template>
 
     <template #user-cell="{ row }">
-      <div v-if="row.original.user" class="flex items-center gap-2">
+      <div
+        v-if="row.original.user"
+        class="flex items-center gap-2"
+      >
         <UAvatar
           :src="row.original.user.image"
           :alt="row.original.user.fullname"

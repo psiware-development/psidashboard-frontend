@@ -64,46 +64,65 @@ const register = async () => {
         :title="error"
       />
 
-      <form class="space-y-5" @submit.prevent="register">
-        <UFormField label="Usuario" required>
+      <form
+        class="space-y-5"
+        @submit.prevent="register"
+      >
+        <UFormField
+          label="Usuario"
+          required
+        >
           <UInput
             v-model="username"
             size="lg"
             placeholder="Tu usuario"
             autocomplete="username"
+            class="w-full"
             :disabled="loading"
           />
         </UFormField>
 
-        <UFormField label="Email" required>
+        <UFormField
+          label="Email"
+          required
+        >
           <UInput
             v-model="email"
             type="email"
             size="lg"
             placeholder="tu@email.com"
             autocomplete="email"
+            class="w-full"
             :disabled="loading"
           />
         </UFormField>
 
-        <UFormField label="Contraseña" required>
+        <UFormField
+          label="Contraseña"
+          required
+        >
           <UInput
             v-model="password"
             type="password"
             size="lg"
             placeholder="••••••••"
             autocomplete="new-password"
+            class="w-full"
             :disabled="loading"
           />
         </UFormField>
 
-        <UFormField label="Repetir contraseña" required>
+        <UFormField
+          label="Repetir contraseña"
+          required
+        >
           <UInput
             v-model="passwordConfirm"
             type="password"
             size="lg"
             placeholder="••••••••"
             autocomplete="new-password"
+            class="w-full"
             :disabled="loading"
           />
         </UFormField>
@@ -119,7 +138,10 @@ const register = async () => {
 
       <p class="text-sm text-muted text-center">
         ¿Ya tenés cuenta?
-        <NuxtLink to="/login" class="text-primary hover:underline">
+        <NuxtLink
+          to="/login"
+          class="text-primary hover:underline"
+        >
           Ingresar
         </NuxtLink>
       </p>

@@ -25,7 +25,10 @@ const ratioColor = {
 </script>
 
 <template>
-  <UTable :data="rows" :columns="columns">
+  <UTable
+    :data="rows"
+    :columns="columns"
+  >
     <template #sprint-cell="{ row }">
       <a
         v-if="row.original.link"
@@ -61,7 +64,10 @@ const ratioColor = {
     </template>
 
     <template #assignedUser-cell="{ row }">
-      <div v-if="row.original.assignedUser" class="flex items-center gap-2">
+      <div
+        v-if="row.original.assignedUser"
+        class="flex items-center gap-2"
+      >
         <UAvatar
           :src="row.original.assignedUser.image"
           :alt="row.original.assignedUser.fullname"

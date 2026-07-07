@@ -22,11 +22,21 @@ const columns: TableColumn<WorkingOnRow>[] = [
   <section class="space-y-4">
     <HomeSectionTitle title="Working on" />
 
-    <div v-if="loading" class="space-y-2">
-      <USkeleton v-for="index in 5" :key="index" class="h-10 rounded-lg" />
+    <div
+      v-if="loading"
+      class="space-y-2"
+    >
+      <USkeleton
+        v-for="index in 5"
+        :key="index"
+        class="h-10 rounded-lg"
+      />
     </div>
 
-    <p v-else-if="rows.length === 0" class="text-center text-sm text-muted">
+    <p
+      v-else-if="rows.length === 0"
+      class="text-center text-sm text-muted"
+    >
       No tiene tareas en progreso.
     </p>
 
@@ -34,7 +44,10 @@ const columns: TableColumn<WorkingOnRow>[] = [
       v-else
       :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }"
     >
-      <UTable :data="rows" :columns="columns">
+      <UTable
+        :data="rows"
+        :columns="columns"
+      >
         <template #ref-cell="{ row }">
           <a
             v-if="row.original.link"
@@ -45,7 +58,10 @@ const columns: TableColumn<WorkingOnRow>[] = [
           >
             {{ row.original.ref }}
           </a>
-          <span v-else class="font-semibold text-primary">
+          <span
+            v-else
+            class="font-semibold text-primary"
+          >
             {{ row.original.ref }}
           </span>
         </template>

@@ -71,7 +71,11 @@ const progress = computed(() =>
           <span class="text-muted">Progreso</span>
           <span class="font-medium">{{ progress }}%</span>
         </div>
-        <UProgress :model-value="progress" color="primary" size="md" />
+        <UProgress
+          :model-value="progress"
+          color="primary"
+          size="md"
+        />
         <p class="text-xs text-muted">
           {{ project.roleTeam ?? 'N/A' }}
         </p>

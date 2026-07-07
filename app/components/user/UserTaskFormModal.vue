@@ -15,11 +15,14 @@ const emit = defineEmits<{
     priority?: string
     severity?: string
     expirationDate: Date
+    userId?: number
   }]
 }>()
 
 const authStore = useAuthStore()
 const { $api } = useNuxtApp()
+const route = useRoute()
+const userIdParam = computed(() => route.params.id as string)
 
 const loading = ref(false)
 const description = ref('')
@@ -28,6 +31,9 @@ const projectId = ref<number | undefined>()
 const priority = ref<string | undefined>()
 const severity = ref<string | undefined>()
 const projectOptions = ref<Array<{ label: string, value: number }>>([])
+
+const userTo = ref<number | undefined>()
+const team = ref<Array<{ label: string, value: number }>>([])
 
 const priorityOptions = [
   { label: 'Low', value: 'Low' },
@@ -50,6 +56,12 @@ const loadOptions = async () => {
 
   try {
     if (authStore.currentUser?.admin || authStore.currentUser?.roleAdmin) {
+      const users = await $api<Array<{ idUser: number, fullname: string }>>('/users/active')
+      team.value = users.map(user => ({
+        label: user.fullname,
+        value: user.idUser
+      }))
+
       const projects = await $api<Array<{ idProject: number, description: string }>>('/project/active')
       projectOptions.value = projects.map(project => ({
         label: project.description,
@@ -64,6 +76,7 @@ const loadOptions = async () => {
     }
   } catch {
     projectOptions.value = []
+    team.value = []
   } finally {
     loading.value = false
   }
@@ -84,17 +97,22 @@ watch(open, async (isOpen) => {
     projectId.value = props.task.projectId
     priority.value = props.task.priority
     severity.value = props.task.severity
+    userTo.value = Number(userIdParam.value)
   } else {
     description.value = ''
     expirationDate.value = new Date().toISOString().slice(0, 10)
     projectId.value = undefined
     priority.value = undefined
     severity.value = undefined
+    userTo.value = Number(userIdParam.value)
   }
 })
 
 const submit = () => {
   if (!description.value.trim()) {
+    return
+  }
+  if ((authStore.currentUser?.admin || authStore.currentUser?.roleAdmin) && !userTo.value) {
     return
   }
 
@@ -103,23 +121,56 @@ const submit = () => {
     projectId: projectId.value,
     priority: priority.value,
     severity: severity.value,
-    expirationDate: new Date(`${expirationDate.value}T00:00:00`)
+    expirationDate: new Date(`${expirationDate.value}T00:00:00`),
+    userId: userTo.value
   })
 }
 </script>
 
 <template>
-  <UModal v-model:open="open" :title="modalTitle">
+  <UModal
+    v-model:open="open"
+    :title="modalTitle"
+  >
     <template #body>
-      <div v-if="loading" class="space-y-3">
+      <div
+        v-if="loading"
+        class="space-y-3"
+      >
         <USkeleton class="h-10" />
         <USkeleton class="h-24" />
         <USkeleton class="h-10" />
       </div>
 
-      <form v-else class="space-y-4" @submit.prevent="submit">
-        <UFormField label="Descripción" required>
-          <UTextarea v-model="description" :rows="4" />
+      <form
+        v-else
+        class="space-y-4"
+        @submit.prevent="submit"
+      >
+        <UFormField
+          v-if="authStore.currentUser?.admin || authStore.currentUser?.roleAdmin"
+          label="Destinatario"
+          required
+        >
+          <USelect
+            v-model="userTo"
+            :items="team"
+            value-key="value"
+            label-key="label"
+            class="w-full"
+            placeholder="Seleccionar destinatario"
+          />
+        </UFormField>
+
+        <UFormField
+          label="Descripción"
+          required
+        >
+          <UTextarea
+            v-model="description"
+            :rows="4"
+            class="w-full"
+          />
         </UFormField>
 
         <UFormField label="Proyecto">
@@ -128,6 +179,7 @@ const submit = () => {
             :items="projectOptions"
             value-key="value"
             label-key="label"
+            class="w-full"
             placeholder="Seleccionar proyecto"
           />
         </UFormField>
@@ -139,6 +191,7 @@ const submit = () => {
               :items="priorityOptions"
               value-key="value"
               label-key="label"
+              class="w-full"
               placeholder="Seleccionar prioridad"
             />
           </UFormField>
@@ -149,25 +202,36 @@ const submit = () => {
               :items="severityOptions"
               value-key="value"
               label-key="label"
+              class="w-full"
               placeholder="Seleccionar severidad"
             />
           </UFormField>
         </div>
 
         <UFormField label="Expira">
-          <UInput v-model="expirationDate" type="date" :min="new Date().toISOString().slice(0, 10)" />
+          <UInput
+            v-model="expirationDate"
+            type="date"
+            class="w-full"
+            :min="new Date().toISOString().slice(0, 10)"
+          />
         </UFormField>
       </form>
     </template>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <UButton color="neutral" variant="ghost" label="Cancelar" @click="open = false" />
+      <div class="flex gap-2">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          label="Cancelar"
+          @click="open = false"
+        />
         <UButton
           color="primary"
           :label="task ? 'Guardar cambios' : 'Crear tarea'"
           :loading="saving"
-          :disabled="!description.trim()"
+          :disabled="!description.trim() || ((authStore.currentUser?.admin || authStore.currentUser?.roleAdmin) && !userTo)"
           @click="submit"
         />
       </div>

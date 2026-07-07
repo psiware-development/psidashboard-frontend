@@ -29,9 +29,18 @@ onMounted(() => {
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <div class="lg:col-span-9 space-y-10">
-        <HomeKpiGrid :kpis="kpis" :loading="loading" />
-        <HomeProjectsGrid :projects="projects" :loading="loading" />
-        <HomeWorkingOnTable :rows="workingOnRows" :loading="loading" />
+        <HomeKpiGrid
+          :kpis="kpis"
+          :loading="loading"
+        />
+        <HomeProjectsGrid
+          :projects="projects"
+          :loading="loading"
+        />
+        <HomeWorkingOnTable
+          :rows="workingOnRows"
+          :loading="loading"
+        />
       </div>
 
       <aside class="lg:col-span-3">

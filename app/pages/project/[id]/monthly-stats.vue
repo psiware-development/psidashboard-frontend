@@ -69,14 +69,27 @@ watch(projectName, (name) => {
       :loading="loading"
     />
 
-    <section v-if="loading || kpis.length > 0" class="space-y-4">
+    <section
+      v-if="loading || kpis.length > 0"
+      class="space-y-4"
+    >
       <HomeSectionTitle title="KPIs" />
 
-      <div v-if="loading" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <USkeleton v-for="index in 4" :key="index" class="h-32 rounded-lg" />
+      <div
+        v-if="loading"
+        class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <USkeleton
+          v-for="index in 4"
+          :key="index"
+          class="h-32 rounded-lg"
+        />
       </div>
 
-      <div v-else class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+      <div
+        v-else
+        class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6"
+      >
         <HomeKpiCard
           v-for="(kpi, index) in kpis"
           :key="index"

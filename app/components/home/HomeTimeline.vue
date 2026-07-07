@@ -23,11 +23,21 @@ const sortedItems = computed(() =>
         body: 'max-h-[700px] overflow-y-auto'
       }"
     >
-      <div v-if="loading" class="space-y-4">
-        <USkeleton v-for="index in 4" :key="index" class="h-20 rounded-lg" />
+      <div
+        v-if="loading"
+        class="space-y-4"
+      >
+        <USkeleton
+          v-for="index in 4"
+          :key="index"
+          class="h-20 rounded-lg"
+        />
       </div>
 
-      <p v-else-if="sortedItems.length === 0" class="text-sm text-muted text-center">
+      <p
+        v-else-if="sortedItems.length === 0"
+        class="text-sm text-muted text-center"
+      >
         No hay actividad reciente.
       </p>
 

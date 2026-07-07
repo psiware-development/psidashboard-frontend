@@ -80,6 +80,15 @@ export const useUserTasks = (userId: MaybeRef<string | number>) => {
       return
     }
 
+    const id = toValue(userId)
+    if (!canAccessUserResource(authStore.currentUser, id)) {
+      toast.add({
+        title: 'No tenés permisos para realizar esta acción',
+        color: 'error'
+      })
+      return
+    }
+
     try {
       await $api(`/cases/${task.id}`, {
         method: 'PATCH',
@@ -146,9 +155,20 @@ export const useUserTasks = (userId: MaybeRef<string | number>) => {
     priority?: string
     severity?: string
     expirationDate: Date
+    userId?: number
   }) => {
     savingTask.value = true
     const id = toValue(userId)
+    const targetUserId = payload.userId ?? Number(id)
+
+    if (!canAccessUserResource(authStore.currentUser, targetUserId)) {
+      toast.add({
+        title: 'No tenés permisos para realizar esta acción',
+        color: 'error'
+      })
+      savingTask.value = false
+      return
+    }
 
     try {
       const body = {
@@ -167,7 +187,7 @@ export const useUserTasks = (userId: MaybeRef<string | number>) => {
         })
         toast.add({ title: 'Tarea editada', color: 'success' })
       } else {
-        await $api(`/cases/tasks/create/${id}`, {
+        await $api(`/cases/tasks/create/${targetUserId}`, {
           method: 'POST',
           body: { ...body, status: 1 }
         })

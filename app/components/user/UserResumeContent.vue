@@ -15,8 +15,15 @@ defineProps<{
 <template>
   <div class="space-y-8">
     <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
-      <div v-if="loading" class="p-4 space-y-2">
-        <USkeleton v-for="index in 4" :key="index" class="h-10" />
+      <div
+        v-if="loading"
+        class="p-4 space-y-2"
+      >
+        <USkeleton
+          v-for="index in 4"
+          :key="index"
+          class="h-10"
+        />
       </div>
 
       <UTable
@@ -35,7 +42,10 @@ defineProps<{
         </template>
       </UTable>
 
-      <p v-else class="p-4 text-sm text-muted text-center">
+      <p
+        v-else
+        class="p-4 text-sm text-muted text-center"
+      >
         No hay proyectos para mostrar.
       </p>
 
@@ -54,8 +64,15 @@ defineProps<{
       <HomeSectionTitle title="Tareas" />
 
       <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
-        <div v-if="loading" class="p-4 space-y-2">
-          <USkeleton v-for="index in 4" :key="index" class="h-10" />
+        <div
+          v-if="loading"
+          class="p-4 space-y-2"
+        >
+          <USkeleton
+            v-for="index in 4"
+            :key="index"
+            class="h-10"
+          />
         </div>
 
         <UTable
@@ -120,7 +137,10 @@ defineProps<{
           </template>
         </UTable>
 
-        <p v-else class="p-4 text-sm text-muted text-center">
+        <p
+          v-else
+          class="p-4 text-sm text-muted text-center"
+        >
           No hay tareas para mostrar.
         </p>
       </UCard>
