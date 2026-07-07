@@ -11,11 +11,21 @@ defineProps<{
   <section class="space-y-4">
     <HomeSectionTitle title="Mis proyectos" />
 
-    <div v-if="loading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      <USkeleton v-for="index in 3" :key="index" class="h-56 rounded-lg" />
+    <div
+      v-if="loading"
+      class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+    >
+      <USkeleton
+        v-for="index in 3"
+        :key="index"
+        class="h-56 rounded-lg"
+      />
     </div>
 
-    <p v-else-if="projects.length === 0" class="text-center text-sm text-muted">
+    <p
+      v-else-if="projects.length === 0"
+      class="text-center text-sm text-muted"
+    >
       No hay proyectos para mostrar.
     </p>
 

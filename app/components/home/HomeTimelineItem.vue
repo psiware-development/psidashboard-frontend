@@ -32,7 +32,11 @@ const sourceLabel = computed(() => {
 
     <div class="space-y-2">
       <div class="flex items-center justify-between gap-2">
-        <UBadge color="neutral" variant="subtle" size="xs">
+        <UBadge
+          color="neutral"
+          variant="subtle"
+          size="xs"
+        >
           {{ sourceLabel }}
         </UBadge>
         <span class="text-xs text-muted whitespace-nowrap">
@@ -40,7 +44,10 @@ const sourceLabel = computed(() => {
         </span>
       </div>
 
-      <div v-if="showUser && item.user" class="flex items-center gap-2 min-w-0">
+      <div
+        v-if="showUser && item.user"
+        class="flex items-center gap-2 min-w-0"
+      >
         <UAvatar
           :src="item.user.image"
           :alt="item.user.fullname"
@@ -55,7 +62,10 @@ const sourceLabel = computed(() => {
         {{ item.project.description }}
       </p>
 
-      <div v-if="entityLabel" class="flex items-start justify-between gap-2">
+      <div
+        v-if="entityLabel"
+        class="flex items-start justify-between gap-2"
+      >
         <a
           v-if="entity?.link"
           :href="entity.link"
@@ -65,7 +75,10 @@ const sourceLabel = computed(() => {
         >
           {{ entityLabel }}
         </a>
-        <span v-else class="text-sm font-medium text-primary line-clamp-1">
+        <span
+          v-else
+          class="text-sm font-medium text-primary line-clamp-1"
+        >
           {{ entityLabel }}
         </span>
 
@@ -75,7 +88,10 @@ const sourceLabel = computed(() => {
         />
       </div>
 
-      <p v-if="item.comment" class="text-sm text-muted">
+      <p
+        v-if="item.comment"
+        class="text-sm text-muted"
+      >
         {{ item.comment }}
       </p>
     </div>

@@ -35,11 +35,21 @@ onMounted(() => {
         />
 
         <div class="flex-1 space-y-4">
-          <div v-if="loading" class="space-y-3">
-            <USkeleton v-for="index in 5" :key="index" class="h-8" />
+          <div
+            v-if="loading"
+            class="space-y-3"
+          >
+            <USkeleton
+              v-for="index in 5"
+              :key="index"
+              class="h-8"
+            />
           </div>
 
-          <dl v-else class="grid gap-3 sm:grid-cols-2">
+          <dl
+            v-else
+            class="grid gap-3 sm:grid-cols-2"
+          >
             <div
               v-for="entry in profileEntries"
               :key="entry.label"

@@ -19,10 +19,20 @@ const truncatedTitle = (title: string) =>
     <div class="space-y-3">
       <div class="flex items-start justify-between gap-2">
         <div class="flex flex-wrap gap-1">
-          <UBadge v-if="task.priority" color="neutral" variant="subtle" size="xs">
+          <UBadge
+            v-if="task.priority"
+            color="neutral"
+            variant="subtle"
+            size="xs"
+          >
             {{ task.priority }}
           </UBadge>
-          <UBadge v-if="task.severity" color="warning" variant="subtle" size="xs">
+          <UBadge
+            v-if="task.severity"
+            color="warning"
+            variant="subtle"
+            size="xs"
+          >
             {{ task.severity }}
           </UBadge>
         </div>
@@ -42,7 +52,11 @@ const truncatedTitle = (title: string) =>
 
       <div class="flex items-center justify-between gap-2 text-xs text-muted">
         <span>{{ formatKanbanDate(task.date) }}</span>
-        <UBadge color="primary" variant="subtle" size="xs">
+        <UBadge
+          color="primary"
+          variant="subtle"
+          size="xs"
+        >
           {{ task.type }}
         </UBadge>
       </div>

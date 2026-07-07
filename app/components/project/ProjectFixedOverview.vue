@@ -24,15 +24,26 @@ defineEmits<{
         </h3>
         <div class="grid sm:grid-cols-2 gap-4">
           <div>
-            <p class="text-3xl font-bold">{{ stats?.total_planned_hours ?? plannedHours }}</p>
-            <p class="text-sm text-muted">Horas planificadas</p>
+            <p class="text-3xl font-bold">
+              {{ stats?.total_planned_hours ?? plannedHours }}
+            </p>
+            <p class="text-sm text-muted">
+              Horas planificadas
+            </p>
           </div>
           <div>
-            <p class="text-3xl font-bold">{{ stats?.total_real_hours ?? declaredHours }}</p>
-            <p class="text-sm text-muted">Horas declaradas</p>
+            <p class="text-3xl font-bold">
+              {{ stats?.total_real_hours ?? declaredHours }}
+            </p>
+            <p class="text-sm text-muted">
+              Horas declaradas
+            </p>
           </div>
         </div>
-        <UProgress :model-value="progress" color="primary" />
+        <UProgress
+          :model-value="progress"
+          color="primary"
+        />
       </div>
     </UCard>
 

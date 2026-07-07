@@ -92,7 +92,10 @@ onMounted(() => {
         </div>
       </UCard>
 
-      <HomeKpiGrid :kpis="kpis" :loading="loading" />
+      <HomeKpiGrid
+        :kpis="kpis"
+        :loading="loading"
+      />
 
       <div class="grid gap-6 lg:grid-cols-12">
         <div class="lg:col-span-8">

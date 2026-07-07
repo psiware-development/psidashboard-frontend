@@ -53,11 +53,21 @@ const toggleCreationSort = () => {
       </div>
     </div>
 
-    <div v-if="loading" class="space-y-2">
-      <USkeleton v-for="index in 6" :key="index" class="h-10 rounded-lg" />
+    <div
+      v-if="loading"
+      class="space-y-2"
+    >
+      <USkeleton
+        v-for="index in 6"
+        :key="index"
+        class="h-10 rounded-lg"
+      />
     </div>
 
-    <p v-else-if="rows.length === 0" class="text-center text-sm text-muted">
+    <p
+      v-else-if="rows.length === 0"
+      class="text-center text-sm text-muted"
+    >
       No hay tareas en progreso para este proyecto.
     </p>
 
@@ -65,7 +75,10 @@ const toggleCreationSort = () => {
       v-else
       :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }"
     >
-      <UTable :data="rows" :columns="columns">
+      <UTable
+        :data="rows"
+        :columns="columns"
+      >
         <template #ref-cell="{ row }">
           <a
             v-if="row.original.link"
@@ -76,7 +89,10 @@ const toggleCreationSort = () => {
           >
             {{ row.original.ref }}
           </a>
-          <span v-else class="whitespace-nowrap">{{ row.original.ref }}</span>
+          <span
+            v-else
+            class="whitespace-nowrap"
+          >{{ row.original.ref }}</span>
         </template>
 
         <template #userName-cell="{ row }">

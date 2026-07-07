@@ -10,13 +10,19 @@ defineProps<{
 
 <template>
   <UCard>
-    <div v-if="loading" class="space-y-4">
+    <div
+      v-if="loading"
+      class="space-y-4"
+    >
       <USkeleton class="h-8 w-32" />
       <USkeleton class="h-24 w-full" />
       <USkeleton class="h-4 w-full" />
     </div>
 
-    <div v-else class="space-y-6">
+    <div
+      v-else
+      class="space-y-6"
+    >
       <div>
         <p class="text-4xl font-bold text-highlighted">
           {{ plannedHours }}
@@ -36,7 +42,11 @@ defineProps<{
           <span class="text-muted">Progreso</span>
           <span class="font-semibold">{{ progress }}%</span>
         </div>
-        <UProgress :model-value="progress" color="primary" size="md" />
+        <UProgress
+          :model-value="progress"
+          color="primary"
+          size="md"
+        />
         <p class="text-sm text-muted">
           Declaradas: <span class="font-semibold text-highlighted">{{ declaredHours }}</span>
         </p>

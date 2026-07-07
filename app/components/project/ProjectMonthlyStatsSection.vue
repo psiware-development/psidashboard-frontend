@@ -14,11 +14,21 @@ defineProps<{
       {{ title }}
     </h2>
 
-    <div v-if="loading" class="grid gap-3 sm:grid-cols-2">
-      <USkeleton v-for="index in 4" :key="index" class="h-24 rounded-lg" />
+    <div
+      v-if="loading"
+      class="grid gap-3 sm:grid-cols-2"
+    >
+      <USkeleton
+        v-for="index in 4"
+        :key="index"
+        class="h-24 rounded-lg"
+      />
     </div>
 
-    <div v-else class="grid gap-3 sm:grid-cols-2">
+    <div
+      v-else
+      class="grid gap-3 sm:grid-cols-2"
+    >
       <UCard
         v-for="item in items"
         :key="item.label"

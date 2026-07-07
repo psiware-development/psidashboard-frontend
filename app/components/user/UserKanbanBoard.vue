@@ -17,11 +17,21 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div v-if="loading" class="grid gap-4 md:grid-cols-3">
-    <USkeleton v-for="index in 3" :key="index" class="h-96 rounded-lg" />
+  <div
+    v-if="loading"
+    class="grid gap-4 md:grid-cols-3"
+  >
+    <USkeleton
+      v-for="index in 3"
+      :key="index"
+      class="h-96 rounded-lg"
+    />
   </div>
 
-  <div v-else class="flex flex-wrap justify-center gap-4">
+  <div
+    v-else
+    class="flex flex-wrap justify-center gap-4"
+  >
     <div
       v-for="column in columns"
       :key="column.title"

@@ -40,7 +40,7 @@ const logout = async () => {
         >
           <UIcon
             name="i-lucide-home"
-            class="w-5 h-5 flex-shrink-0 text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-colors" 
+            class="w-5 h-5 flex-shrink-0 text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-colors"
           />
           <span
             v-if="isExpanded"

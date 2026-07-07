@@ -18,7 +18,10 @@ const columns: TableColumn<ProjectTaskRow>[] = [
 </script>
 
 <template>
-  <UTable :data="rows" :columns="columns">
+  <UTable
+    :data="rows"
+    :columns="columns"
+  >
     <template #taigaRef-cell="{ row }">
       <a
         v-if="row.original.taigaLink"
@@ -33,7 +36,10 @@ const columns: TableColumn<ProjectTaskRow>[] = [
     </template>
 
     <template #user-cell="{ row }">
-      <div v-if="row.original.user" class="flex items-center gap-2">
+      <div
+        v-if="row.original.user"
+        class="flex items-center gap-2"
+      >
         <UAvatar
           :src="row.original.user.image"
           :alt="row.original.user.fullname"
