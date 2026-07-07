@@ -1,51 +1,42 @@
 <template>
-  <div class="min-h-screen flex flex-col">
-    <UHeader>
-      <template #left>
-        <AppSiteLogo />
-      </template>
+  <div class="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
+    <AppNavbar
+      v-model:is-expanded="isExpanded"
+      :is-mobile="isMobile"
+    />
 
-      <template #right>
-        <nav class="hidden sm:flex items-center gap-1 mr-2">
-          <UButton
-            v-if="authStore.currentUser?.idUser"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            label="Tareas"
-            :to="`/user/${authStore.currentUser.idUser}/tasks`"
-          />
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            label="Mis datos"
-            to="/me"
-          />
-        </nav>
-        <span class="text-sm text-muted mr-2">
-          {{ authStore.displayName }}
-        </span>
-        <UButton
-          color="neutral"
-          variant="ghost"
-          label="Salir"
-          @click="logout"
-        />
-      </template>
-    </UHeader>
+    <div class="flex flex-1 relative">
+      <AppSidebar
+        v-model:is-expanded="isExpanded"
+        :is-mobile="isMobile"
+      />
 
-    <UMain class="bg-muted/30">
-      <slot />
-    </UMain>
+      <main class="flex-1 min-w-0 p-4 md:p-6 transition-all duration-300">
+        <slot />
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore()
+const isExpanded = ref(true)
+const isMobile = ref(false)
 
-const logout = async () => {
-  authStore.logout()
-  await navigateTo('/login')
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth < 768
+  if (isMobile.value) {
+    isExpanded.value = false
+  } else {
+    isExpanded.value = true
+  }
 }
+
+onMounted(() => {
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScreenSize)
+})
 </script>
