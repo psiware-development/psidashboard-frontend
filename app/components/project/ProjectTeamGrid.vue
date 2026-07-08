@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <section class="space-y-4">
-    <HomeSectionTitle :title="`Team (${members.length})`" />
+    <SectionTitle :title="`Team (${members.length})`" />
 
     <div
       v-if="loading"

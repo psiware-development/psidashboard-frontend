@@ -22,7 +22,7 @@ onMounted(() => {
 
 <template>
   <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-    <HomeSectionTitle title="Mensajes" />
+    <SectionTitle title="Mensajes" />
 
     <UAlert
       v-if="error"

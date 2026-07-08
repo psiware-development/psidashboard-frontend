@@ -16,7 +16,7 @@ const sortedItems = computed(() =>
 
 <template>
   <section class="space-y-4">
-    <HomeSectionTitle title="Timeline" />
+    <SectionTitle title="Timeline" />
 
     <UCard
       :ui="{

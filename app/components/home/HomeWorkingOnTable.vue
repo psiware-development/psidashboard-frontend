@@ -20,7 +20,7 @@ const columns: TableColumn<WorkingOnRow>[] = [
 
 <template>
   <section class="space-y-4">
-    <HomeSectionTitle title="Working on" />
+    <SectionTitle title="Working on" />
 
     <div
       v-if="loading"

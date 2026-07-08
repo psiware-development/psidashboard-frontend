@@ -17,7 +17,7 @@ onMounted(() => {
 
 <template>
   <div class="mx-auto w-full max-w-[900px] px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-    <HomeSectionTitle title="Mis datos" />
+    <SectionTitle title="Mis datos" />
 
     <UAlert
       v-if="error"

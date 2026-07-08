@@ -12,7 +12,7 @@ defineProps<{
     v-if="loading || kpis.length > 0"
     class="space-y-4"
   >
-    <HomeSectionTitle title="KPIs" />
+    <SectionTitle title="KPIs" />
 
     <div
       v-if="loading"
@@ -29,7 +29,7 @@ defineProps<{
       v-else
       class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3"
     >
-      <HomeKpiCard
+      <KpiCard
         v-for="kpi in kpis"
         :key="kpi.idKPI"
         :kpi="kpi"

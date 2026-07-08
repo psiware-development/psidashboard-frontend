@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 <template>
   <section class="space-y-4">
-    <HomeSectionTitle :title="title" />
+    <SectionTitle :title="title" />
 
     <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
       <div
