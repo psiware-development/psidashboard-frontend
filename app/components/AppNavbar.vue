@@ -23,9 +23,6 @@ const authStore = useAuthStore()
 
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2">
-        <span class="text-sm font-medium hidden sm:inline-block">
-          {{ authStore.displayName }}
-        </span>
         <NuxtLink
           to="/me"
         >
