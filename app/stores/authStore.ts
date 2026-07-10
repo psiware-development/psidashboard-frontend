@@ -10,6 +10,10 @@ function buildUserRoles(user: User): UserRole[] {
     roles.push({ role: 'sm' })
   }
 
+  if (user.roleAdmin || user.admin) {
+    roles.push({ role: 'admin' })
+  }
+
   return roles
 }
 

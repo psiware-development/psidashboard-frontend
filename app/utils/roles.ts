@@ -1,6 +1,7 @@
 export enum UserRoles {
   USER = 'user',
-  SM = 'sm'
+  SM = 'sm',
+  ADMIN = 'admin'
 }
 
 export const checkUserRoles = (userRoles: UserRoles[], neededRoles: UserRoles[]) => {
