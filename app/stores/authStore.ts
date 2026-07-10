@@ -1,5 +1,5 @@
 import { jwtDecode } from 'jwt-decode'
-import type { User, UserRole, UserStatusResponse, SignupResponse } from '~/types/user'
+import type { User, UserRole, UserStatusResponse } from '~/types/user'
 
 const TOKEN_EXPIRATION_KEY = 'psidashboard_expiration_token_session'
 
@@ -90,24 +90,7 @@ export const useAuthStore = defineStore('auth', {
 
       this.setSession(token, status.me)
     },
-    async register(payload: {
-      username: string
-      email: string
-      password: string
-      passwordConfirm: string
-    }) {
-      const { $api } = useNuxtApp()
 
-      const response = await $api<SignupResponse>('/users/signup', {
-        method: 'POST',
-        body: payload
-      })
-
-      this.setSession(response.token, {
-        ...response.data.user,
-        roles: buildUserRoles(response.data.user)
-      })
-    },
     async restoreSession() {
       if (!this.accessToken || this.isTokenExpired()) {
         this.clearSession()
