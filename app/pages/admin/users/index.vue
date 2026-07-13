@@ -9,7 +9,6 @@ const {
   roles,
   search,
   filterRoleId,
-  filterActive,
   filteredUsers,
   fetchUsers,
   deleteUser
@@ -21,12 +20,6 @@ const roleFilterOptions = computed(() => [
   { label: 'Todos los roles', value: undefined },
   ...roles.value.map(r => ({ label: r.description, value: r.idRole }))
 ])
-
-const activeFilterOptions = [
-  { label: 'Todos', value: undefined },
-  { label: 'Activos', value: true },
-  { label: 'Inactivos', value: false }
-]
 
 type PermissionBadge = { label: string, color: 'warning' | 'neutral' }
 
@@ -78,21 +71,14 @@ const handleDelete = async () => {
     <ListFilters
       v-model="search"
       search-placeholder="Buscar por nombre, usuario o email..."
-      :has-active-filters="filterRoleId !== undefined || filterActive !== undefined"
-      @clear="() => { search = ''; filterRoleId = undefined; filterActive = undefined }"
+      :has-active-filters="filterRoleId !== undefined"
+      @clear="() => { search = ''; filterRoleId = undefined }"
     >
       <USelect
         v-model="filterRoleId"
         :items="roleFilterOptions"
         class="min-w-[180px]"
         placeholder="Filtrar por rol"
-      />
-
-      <USelect
-        v-model="filterActive"
-        :items="activeFilterOptions"
-        class="min-w-[140px]"
-        placeholder="Estado"
       />
     </ListFilters>
 
