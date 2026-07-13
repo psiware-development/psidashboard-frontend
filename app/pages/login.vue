@@ -104,16 +104,6 @@ const login = async () => {
           :loading="loading"
         />
       </form>
-
-      <p class="text-sm text-muted text-center">
-        ¿No tenés cuenta?
-        <NuxtLink
-          to="/register"
-          class="text-primary hover:underline"
-        >
-          Registrarse
-        </NuxtLink>
-      </p>
     </div>
 
     <p class="text-xs text-muted">

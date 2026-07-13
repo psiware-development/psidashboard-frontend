@@ -1,1 +1,1 @@
-export const publicPages = ['/login', '/register']
+export const publicPages = ['/login']

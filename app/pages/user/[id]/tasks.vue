@@ -28,7 +28,7 @@ onMounted(() => {
 <template>
   <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <HomeSectionTitle title="Tareas" />
+      <SectionTitle title="Tareas" />
       <UButton
         v-if="user && !forbidden"
         color="primary"

@@ -61,7 +61,7 @@ defineProps<{
     </UCard>
 
     <section class="space-y-4">
-      <HomeSectionTitle title="Tareas" />
+      <SectionTitle title="Tareas" />
 
       <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
         <div

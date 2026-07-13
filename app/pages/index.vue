@@ -29,7 +29,7 @@ onMounted(() => {
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <div class="lg:col-span-9 space-y-10">
-        <HomeKpiGrid
+        <KpiGrid
           :kpis="kpis"
           :loading="loading"
         />

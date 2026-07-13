@@ -5,6 +5,8 @@ defineProps<{
 }>()
 
 const authStore = useAuthStore()
+const isAdmin = computed(() => !!authStore.currentUser?.roleAdmin)
+const authenticatedUserId = computed(() => authStore.currentUser?.idUser)
 
 const closeSidebar = () => {
   isExpanded.value = false
@@ -25,50 +27,59 @@ const logout = async () => {
     />
 
     <aside
-      class="fixed md:sticky top-16 left-0 h-[calc(100vh-4rem)] border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 transition-all duration-300 z-40 flex flex-col justify-between"
+      class="fixed md:sticky top-16 left-0 h-[calc(100vh-4rem)] border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 transition-all duration-300 z-40 flex flex-col justify-between overflow-x-hidden"
       :class="[
         isExpanded ? 'w-64' : 'w-16',
         isMobile && !isExpanded ? '-translate-x-full' : 'translate-x-0'
       ]"
     >
-      <div class="flex-1 py-4 px-3 space-y-1">
-        <NuxtLink
+      <div class="flex-1 py-4 px-3 space-y-2 overflow-y-auto overflow-x-hidden">
+        <AppSidebarLink
           to="/"
-          class="flex items-center rounded-lg text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white transition-all duration-200 group py-2.5"
-          :class="isExpanded ? 'px-3 gap-3 w-full' : 'justify-center px-0 w-10 mx-auto'"
-          active-class="bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/10 dark:text-primary dark:hover:bg-primary/15"
-        >
-          <UIcon
-            name="i-lucide-home"
-            class="w-5 h-5 flex-shrink-0 text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-colors"
-          />
-          <span
-            v-if="isExpanded"
-            class="text-sm font-medium transition-opacity duration-200"
-          >
-            Inicio
-          </span>
-        </NuxtLink>
+          icon="i-lucide-home"
+          label="Inicio"
+          :is-expanded="isExpanded"
+        />
 
-        <NuxtLink
-          v-if="authStore.currentUser?.idUser"
-          v-slot="{ isActive }"
-          :to="`/user/${authStore.currentUser.idUser}/tasks`"
-          class="flex items-center rounded-lg text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white transition-all duration-200 group py-2.5"
-          :class="isExpanded ? 'px-3 gap-3 w-full' : 'justify-center px-0 w-10 mx-auto'"
-          active-class="bg-primary/10 text-primary hover:bg-primary/15 dark:bg-primary/10 dark:text-primary dark:hover:bg-primary/15"
+        <AppSidebarLink
+          :to="`/user/${authenticatedUserId}/tasks`"
+          icon="i-lucide-check-square"
+          label="Mis tareas"
+          :is-expanded="isExpanded"
+        />
+
+        <AppSidebarLink
+          :to="`/user/${authenticatedUserId}/resume`"
+          icon="i-lucide-file-text"
+          label="Mi resume"
+          :is-expanded="isExpanded"
+        />
+
+        <div
+          v-if="isAdmin"
+          class="space-y-1"
         >
-          <UIcon
-            name="i-lucide-check-square"
-            class="w-5 h-5 flex-shrink-0 text-neutral-400 group-hover:text-neutral-950 dark:group-hover:text-white transition-colors"
-          />
-          <span
+          <p
             v-if="isExpanded"
-            class="text-sm font-medium transition-opacity duration-200"
+            class="px-3 text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2"
           >
-            Tareas
-          </span>
-        </NuxtLink>
+            Administración
+          </p>
+
+          <AppSidebarLink
+            to="/admin/users"
+            icon="i-lucide-users"
+            label="Usuarios"
+            :is-expanded="isExpanded"
+          />
+
+          <AppSidebarLink
+            to="/admin/projects"
+            icon="i-lucide-folder-kanban"
+            label="Proyectos"
+            :is-expanded="isExpanded"
+          />
+        </div>
       </div>
 
       <div class="p-3 border-t border-neutral-200 dark:border-neutral-800">
