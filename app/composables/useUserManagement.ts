@@ -26,7 +26,6 @@ export const useUserManagement = () => {
 
   const search = ref('')
   const filterRoleId = ref<number | undefined>()
-  const filterActive = ref<boolean | undefined>()
 
   const filteredUsers = computed(() => {
     return users.value.filter((u) => {
@@ -38,10 +37,7 @@ export const useUserManagement = () => {
       const matchesRole = filterRoleId.value === undefined
         || u.mainRole?.idRole === filterRoleId.value
 
-      const matchesActive = filterActive.value === undefined
-        || u.active === filterActive.value
-
-      return matchesSearch && matchesRole && matchesActive
+      return matchesSearch && matchesRole
     })
   })
 
@@ -85,7 +81,7 @@ export const useUserManagement = () => {
           }
         }
       })
-      users.value = response.users || []
+      users.value = (response.users || []).filter(u => u.active)
     } catch {
       error.value = 'No se pudo cargar el listado de usuarios.'
     } finally {
@@ -175,7 +171,6 @@ export const useUserManagement = () => {
     roles,
     search,
     filterRoleId,
-    filterActive,
     filteredUsers,
     fetchUsers,
     fetchUser,
