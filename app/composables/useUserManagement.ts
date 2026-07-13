@@ -46,42 +46,8 @@ export const useUserManagement = () => {
     error.value = null
 
     try {
-      const response = await $api<{
-        users: User[]
-        timestamp: string
-        status: number
-        error: string | null
-        path: string
-      }>('/users', {
-        parseResponse: (text) => {
-          const trimmed = text.trim()
-          if (trimmed.startsWith('[')) {
-            const lastBracketIndex = trimmed.lastIndexOf(']')
-            if (lastBracketIndex !== -1) {
-              try {
-                const parsedUsers = JSON.parse(trimmed.substring(0, lastBracketIndex + 1))
-                const metadataStr = trimmed.substring(lastBracketIndex + 1).trim()
-                const metadata = metadataStr ? JSON.parse(metadataStr) : {}
-                return {
-                  users: parsedUsers,
-                  timestamp: metadata.timestamp || '',
-                  status: metadata.status || 200,
-                  error: metadata.error || null,
-                  path: metadata.path || ''
-                }
-              } catch (e) {
-                throw new Error('Error al parsear la respuesta concatenada de usuarios: ' + e)
-              }
-            }
-          }
-          try {
-            return JSON.parse(text)
-          } catch (e) {
-            throw new Error('Error al parsear JSON: ' + e)
-          }
-        }
-      })
-      users.value = (response.users || []).filter(u => u.active)
+      const response = await $api<User[]>('/users/active')
+      users.value = response || []
     } catch {
       error.value = 'No se pudo cargar el listado de usuarios.'
     } finally {
