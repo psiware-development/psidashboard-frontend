@@ -23,12 +23,14 @@
     "@nuxt/fonts": "^0.14.0",
     "@nuxt/ui": "^4.8.2",
     "@pinia/nuxt": "0.11.3",
+    "chart.js": "^4.5.1",
     "jwt-decode": "^4.0.0",
     "nuxt": "^4.4.6",
     "nuxt-lucide-icons": "2.1.0",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
     "tailwindcss": "^4.3.0",
+    "vue-chartjs": "^5.3.4",
     "vuedraggable": "4.1.0"
   },
   "devDependencies": {
