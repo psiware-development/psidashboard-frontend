@@ -1,5 +1,11 @@
 export interface UserRole {
+  id: number
   role: string
+}
+
+export interface UserMainRole {
+  idRole: number
+  description: string
 }
 
 export interface User {
@@ -7,16 +13,29 @@ export interface User {
   username: string
   fullname?: string
   email?: string
+  active?: boolean
+  image?: string
+  idTaigaUser?: number | string
+  gitHubLogin?: string
   roleSM?: boolean
   roleAdmin?: boolean
   admin?: boolean
-  mainRole?: {
-    idRole: number
-    description?: string
-  }
+  scrummaster?: boolean
+  operationsManager?: boolean
+  mainRole?: UserMainRole
   roles?: UserRole[]
-  image?: string
-  idTaigaUser?: number | string
+}
+
+export interface UserFormPayload {
+  username: string
+  fullname: string
+  email: string
+  password?: string
+  idRole?: number
+  idTaigaUser?: number | null
+  gitHubLogin?: string
+  roleSM?: boolean
+  roleAdmin?: boolean
 }
 
 export interface UserStatusResponse {
