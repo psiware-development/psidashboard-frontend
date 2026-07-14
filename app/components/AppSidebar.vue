@@ -55,6 +55,13 @@ const logout = async () => {
           :is-expanded="isExpanded"
         />
 
+        <AppSidebarLink
+          to="/collaborators/monitor"
+          icon="i-lucide-clock"
+          label="Reporte de horas"
+          :is-expanded="isExpanded"
+        />
+
         <div
           v-if="isAdmin"
           class="space-y-1"
