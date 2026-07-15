@@ -7,18 +7,30 @@ const {
   error,
   projects,
   search,
-  filterActive,
+  filterType,
   filteredProjects,
   fetchProjects
 } = useProjectsManagment()
 
 onMounted(() => fetchProjects())
 
-const activeFilterOptions = [
-  { label: 'Todos', value: undefined },
-  { label: 'Activos', value: true },
-  { label: 'Inactivos', value: false }
+const typeFilterOptions = [
+  { label: 'Todos los tipos', value: undefined },
+  { label: 'Fijo', value: 'fixed' },
+  { label: 'Continuo', value: 'continuos' }
 ]
+
+const clearFilters = () => {
+  search.value = ''
+  filterType.value = undefined
+}
+
+const hasActiveFilters = computed(() => filterType.value !== undefined)
+
+const projectTypeBadge = (project: typeof filteredProjects.value[number]) => {
+  if (project.fixed) return { label: 'Fijo' }
+  return { label: 'Continuo' }
+}
 </script>
 
 <template>
@@ -39,84 +51,76 @@ const activeFilterOptions = [
       :title="error"
     />
 
-    <!-- ── Filters ─────────────────────────────────────────────────────── -->
     <ListFilters
       v-model="search"
-      search-placeholder="Buscar por nombre o descripción..."
-      :has-active-filters="filterActive !== undefined"
-      @clear="() => { search = ''; filterActive = undefined }"
+      search-placeholder="Buscar por proyecto o cliente..."
+      :has-active-filters="hasActiveFilters"
+      @clear="clearFilters"
     >
       <USelect
-        v-model="filterActive"
-        :items="activeFilterOptions"
-        class="min-w-[140px]"
-        placeholder="Estado"
+        v-model="filterType"
+        :items="typeFilterOptions"
+        class="min-w-[160px]"
+        placeholder="Tipo"
       />
     </ListFilters>
 
-    <!-- ── Table ───────────────────────────────────────────────────────── -->
     <ListTable
       :loading="loading"
       :is-empty="filteredProjects.length === 0"
       empty-icon="i-lucide-folder-kanban"
       empty-text="No se encontraron proyectos con esos filtros."
     >
+      <template #headers>
+        <div class="hidden sm:grid grid-cols-[1fr_1fr_1fr_auto] gap-4 px-6 py-2 border-b border-default bg-neutral-50 dark:bg-neutral-800/40">
+          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Proyecto</span>
+          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Cliente</span>
+          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Tipo</span>
+          <span class="text-xs font-semibold text-muted uppercase tracking-wide text-right">Acciones</span>
+        </div>
+      </template>
+
       <div
         v-for="project in filteredProjects"
         :key="project.idProject"
-        class="flex flex-wrap items-center gap-4 px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+        class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] items-center gap-4 px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
       >
-        <!-- Icon + name -->
-        <div class="flex items-center gap-3 flex-1 min-w-[200px]">
-          <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <UIcon
-              name="i-lucide-folder-kanban"
-              class="w-5 h-5 text-primary"
-            />
-          </div>
-          <div>
-            <p class="text-sm font-medium text-highlighted">
-              {{ project.name }}
-            </p>
-            <p
-              v-if="project.description"
-              class="text-xs text-muted line-clamp-1"
-            >
-              {{ project.description }}
-            </p>
-            <p
-              v-if="project.slug"
-              class="text-xs text-muted font-mono"
-            >
-              /{{ project.slug }}
-            </p>
-          </div>
+        <!-- Proyecto -->
+        <div class="flex items-center gap-3">
+          <p class="text-sm font-medium text-highlighted">
+            {{ project.description }}
+          </p>
         </div>
 
-        <!-- Taiga integration -->
-        <div class="min-w-[100px]">
+        <!-- Cliente -->
+        <div>
           <span
-            v-if="project.idTaigaProject"
-            class="flex items-center gap-1 text-xs text-muted"
+            class="text-sm font-medium"
+            :class="project.internal ? 'text-primary' : 'text-highlighted'"
           >
-            <UIcon
-              name="i-lucide-git-branch"
-              class="w-3.5 h-3.5"
-            />
-            Taiga #{{ project.idTaigaProject }}
+            {{ project.customer.corporateName }}
           </span>
         </div>
 
-        <!-- Estado badge -->
-        <UBadge
-          :color="project.active ? 'success' : 'neutral'"
-          variant="subtle"
-          :label="project.active ? 'Activo' : 'Inactivo'"
-          size="sm"
-        />
+        <!-- Tipo -->
+        <div class="flex flex-wrap gap-1.5">
+          <UBadge
+            variant="subtle"
+            :label="projectTypeBadge(project).label"
+            size="md"
+          />
+        </div>
 
-        <!-- Actions -->
-        <div class="flex items-center gap-2 ml-auto">
+        <!-- Acciones -->
+        <div class="flex items-center gap-2">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-eye"
+            size="sm"
+            :to="`/project/${project.idProject}/tracking`"
+            aria-label="Ver proyecto"
+          />
           <UButton
             color="neutral"
             variant="ghost"
