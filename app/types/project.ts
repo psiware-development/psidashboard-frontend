@@ -1,11 +1,5 @@
 import type { TimelineItem } from '~/types/dashboard'
-
-export interface ProjectInfo {
-  idProject: number
-  description: string
-  fixed?: boolean
-  kickoffRealDate?: string
-}
+import type { Customer } from '~/types/customer'
 
 export interface ProjectPlanification {
   total?: number
@@ -96,7 +90,7 @@ export interface ProjectFixedStats {
 }
 
 export interface ProjectTrackingData {
-  project: ProjectInfo
+  project: AnyProject
   planification?: ProjectPlanification
   clockify?: ProjectClockifyTask[] | Record<string, ProjectClockifyTask[]>
   disciplines?: Record<string, ProjectDisciplineRaw | number>
@@ -227,4 +221,59 @@ export interface ProjectMonthlyStats {
   metrics?: Record<string, number | string>
   kpis?: ProjectMonthlyKpi[]
   database?: unknown
+}
+
+export interface Project {
+  idProject: number
+  description: string
+  active: boolean
+  customer: Customer
+  clockifyID?: string
+  projectType: number
+  color?: string
+  fixed: boolean
+  fromCyP: boolean
+  continuos: boolean
+  internal: boolean
+}
+
+export interface ProjectFixed extends Project {
+  fixed: true
+  taigaProjectID?: number
+  taigaSlug?: string
+  totalRealHours?: number
+  totalPoints?: number
+  plannedQuantityHours?: number
+  plannedMilestonesPerMonth?: number
+  currentBudget?: number
+  taigaConfigurationVerificationId?: number
+  taigaConfigurationValidationId?: number
+}
+
+export interface ProjectContinuos extends Project {
+  fixed: false
+}
+
+export type AnyProject = ProjectFixed | ProjectContinuos
+
+export interface ProjectFormPayload {
+  description: string
+  active: boolean
+  idCustomer: number
+  projectType: number
+  fixed: boolean
+  continuos: boolean
+  fromCyP: boolean
+  internal: boolean
+  clockifyID?: string
+  color?: string
+  // Campos Taiga — solo aplican cuando fixed = true
+  taigaProjectID?: number | null
+  taigaSlug?: string | null
+  taigaConfigurationVerificationId?: number | null
+  taigaConfigurationValidationId?: number | null
+  // Planificación — solo aplican cuando fixed = true
+  plannedQuantityHours?: number | null
+  plannedMilestonesPerMonth?: number | null
+  currentBudget?: number | null
 }

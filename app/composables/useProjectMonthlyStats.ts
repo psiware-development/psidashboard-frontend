@@ -40,10 +40,10 @@ export const useProjectMonthlyStats = (projectId: MaybeRef<string | number>) => 
     try {
       const date = formatMonthParam(selectedMonth.value)
       const [statsResponse, trackingResponse] = await Promise.all([
-        $api<ProjectMonthlyStats>(`/project/${toValue(projectId)}/monthly-stats`, {
+        $api<ProjectMonthlyStats>(`/projects/${toValue(projectId)}/monthly-stats`, {
           query: { date }
         }),
-        $api<ProjectTrackingData>(`/project/${toValue(projectId)}/tracking`)
+        $api<ProjectTrackingData>(`/projects/${toValue(projectId)}/tracking`)
       ])
 
       stats.value = statsResponse
