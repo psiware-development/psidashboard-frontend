@@ -1,6 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from '@tailwindcss/vite'
-
 const apiBaseUrl = process.env.API_BASE_URL || 'https://psi-rest-services.onrender.com'
 
 export default defineNuxtConfig({
@@ -13,15 +11,6 @@ export default defineNuxtConfig({
     'nuxt-lucide-icons'
   ],
 
-  fonts: {
-    defaults: {
-      weights: [300, 400, 500, 600, 700]
-    },
-    families: [
-      { name: 'Kanit', provider: 'google' }
-    ]
-  },
-
   devtools: {
     enabled: true
   },
@@ -31,11 +20,17 @@ export default defineNuxtConfig({
   runtimeConfig: {
     apiBaseUrl,
     public: {
-      appTitlePrefix: 'PSI Dashboard'
+      appTitlePrefix: 'PSI Dashboard',
+      tokenExpirationKey: process.env.TOKEN_EXPIRATION_KEY || 'psidashboard_token_expiration'
     }
   },
 
   compatibilityDate: '2025-01-15',
+  nitro: {
+    routeRules: {
+      '/backend/**': { proxy: `${apiBaseUrl}/**` }
+    }
+  },
   vite: {
     server: {
       allowedHosts: ['localhost:3001']
@@ -49,9 +44,13 @@ export default defineNuxtConfig({
       }
     }
   },
-  nitro: {
-    routeRules: {
-      '/backend/**': { proxy: `${apiBaseUrl}/**` }
-    }
+
+  fonts: {
+    defaults: {
+      weights: [300, 400, 500, 600, 700]
+    },
+    families: [
+      { name: 'Kanit', provider: 'google' }
+    ]
   }
 })
