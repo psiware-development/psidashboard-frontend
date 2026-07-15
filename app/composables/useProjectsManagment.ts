@@ -1,4 +1,4 @@
-import type { AdminProject, AdminProjectFormPayload } from '~/types/project'
+import type { AnyProject, ProjectFormPayload } from '~/types/project'
 
 export const useProjectsManagment = () => {
   const { $api } = useNuxtApp()
@@ -7,21 +7,26 @@ export const useProjectsManagment = () => {
   const loading = ref(false)
   const saving = ref(false)
   const error = ref<string | null>(null)
-  const projects = ref<AdminProject[]>([])
+  const projects = ref<AnyProject[]>([])
 
   const search = ref('')
   const filterActive = ref<boolean | undefined>()
+  const filterType = ref<'fixed' | 'continuos' | undefined>()
 
   const filteredProjects = computed(() => {
     return projects.value.filter((p) => {
       const matchesSearch = !search.value
-        || p.name?.toLowerCase().includes(search.value.toLowerCase())
         || p.description?.toLowerCase().includes(search.value.toLowerCase())
+        || p.customer?.corporateName?.toLowerCase().includes(search.value.toLowerCase())
 
       const matchesActive = filterActive.value === undefined
         || p.active === filterActive.value
 
-      return matchesSearch && matchesActive
+      const matchesType = filterType.value === undefined
+        || (filterType.value === 'fixed' && p.fixed)
+        || (filterType.value === 'continuos' && !p.fixed)
+
+      return matchesSearch && matchesActive && matchesType
     })
   })
 
@@ -30,7 +35,7 @@ export const useProjectsManagment = () => {
     error.value = null
 
     try {
-      const response = await $api<AdminProject[]>('/projects/active')
+      const response = await $api<AnyProject[]>('/projects/active')
       projects.value = response ?? []
     } catch {
       error.value = 'No se pudo cargar el listado de proyectos.'
@@ -39,26 +44,20 @@ export const useProjectsManagment = () => {
     }
   }
 
-  const fetchProject = async (id: number): Promise<AdminProject | null> => {
+  const fetchProject = async (id: number): Promise<AnyProject | null> => {
     try {
-      return await $api<AdminProject>(`/projects/${id}`)
+      return await $api<AnyProject>(`/projects/${id}`)
     } catch {
       return null
     }
   }
 
-  const createProject = async (payload: AdminProjectFormPayload): Promise<boolean> => {
+  const createProject = async (payload: ProjectFormPayload): Promise<boolean> => {
     saving.value = true
     try {
       await $api('/projects', {
         method: 'POST',
-        body: {
-          name: payload.name,
-          description: payload.description || null,
-          active: payload.active ?? true,
-          id_taiga_project: payload.idTaigaProject || null,
-          slug: payload.slug || null
-        }
+        body: payload
       })
       toast.add({ title: 'Proyecto creado correctamente', color: 'success' })
       return true
@@ -70,18 +69,12 @@ export const useProjectsManagment = () => {
     }
   }
 
-  const updateProject = async (id: number, payload: AdminProjectFormPayload): Promise<boolean> => {
+  const updateProject = async (id: number, payload: ProjectFormPayload): Promise<boolean> => {
     saving.value = true
     try {
       await $api(`/projects/${id}`, {
         method: 'PATCH',
-        body: {
-          name: payload.name,
-          description: payload.description || null,
-          active: payload.active ?? true,
-          id_taiga_project: payload.idTaigaProject || null,
-          slug: payload.slug || null
-        }
+        body: payload
       })
       toast.add({ title: 'Proyecto actualizado correctamente', color: 'success' })
       return true
@@ -100,6 +93,7 @@ export const useProjectsManagment = () => {
     projects,
     search,
     filterActive,
+    filterType,
     filteredProjects,
     fetchProjects,
     fetchProject,
