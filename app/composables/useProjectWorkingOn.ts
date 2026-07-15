@@ -37,9 +37,9 @@ export const useProjectWorkingOn = (projectId: MaybeRef<string | number>) => {
     try {
       const [workingOnResponse, trackingResponse] = await Promise.all([
         $api<{ data: ProjectWorkingOnResponse } | ProjectWorkingOnResponse>(
-          `/project/${toValue(projectId)}/working-on`
+          `/projects/${toValue(projectId)}/working-on`
         ),
-        $api<ProjectTrackingData>(`/project/${toValue(projectId)}/tracking`)
+        $api<ProjectTrackingData>(`/projects/${toValue(projectId)}/tracking`)
       ])
 
       const payload = 'data' in workingOnResponse && workingOnResponse.data?.tasks

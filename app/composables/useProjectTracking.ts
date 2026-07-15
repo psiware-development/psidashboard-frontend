@@ -86,7 +86,7 @@ export const useProjectTracking = (projectId: MaybeRef<string | number>) => {
 
     try {
       projectData.value = await $api<ProjectTrackingData>(
-        `/project/${toValue(projectId)}/tracking`
+        `/projects/${toValue(projectId)}/tracking`
       )
     } catch (err: unknown) {
       const status = (err as { statusCode?: number, response?: { status?: number } })?.statusCode
@@ -112,7 +112,7 @@ export const useProjectTracking = (projectId: MaybeRef<string | number>) => {
 
     try {
       const blob = await $api<Blob>(
-        `/project/${projectIdValue.value}/clockify/reports/monthly`,
+        `/projects/${projectIdValue.value}/clockify/reports/monthly`,
         { responseType: 'blob' }
       )
 

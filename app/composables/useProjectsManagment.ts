@@ -30,7 +30,7 @@ export const useProjectsManagment = () => {
     error.value = null
 
     try {
-      const response = await $api<AdminProject[]>('/projects')
+      const response = await $api<AdminProject[]>('/projects/active')
       projects.value = response ?? []
     } catch {
       error.value = 'No se pudo cargar el listado de proyectos.'
