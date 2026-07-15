@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import type { ProjectFormPayload } from '~/types/project'
+
 definePageMeta({ roles: ['admin'] })
 usePageTitle('Nuevo proyecto')
 
 const { saving, createProject } = useProjectsManagment()
 
-const handleSubmit = async (payload: Parameters<typeof createProject>[0]) => {
+const handleSubmit = async (payload: ProjectFormPayload) => {
   const ok = await createProject(payload)
   if (ok) {
     await navigateTo('/admin/projects')

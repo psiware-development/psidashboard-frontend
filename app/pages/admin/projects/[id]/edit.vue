@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ProjectFormPayload } from '~/types/project'
+
 definePageMeta({ roles: ['admin'] })
 
 const route = useRoute()
@@ -14,22 +16,36 @@ onMounted(async () => {
   loadingProject.value = false
 
   if (project.value) {
-    usePageTitle(`Editar — ${project.value.name}`)
+    usePageTitle(`Editar — ${project.value.description}`)
   }
 })
 
-const initialData = computed(() => {
+const initialData = computed((): Partial<ProjectFormPayload> | undefined => {
   if (!project.value) return undefined
+  const p = project.value
   return {
-    name: project.value.name,
-    description: project.value.description ?? '',
-    active: project.value.active ?? true,
-    idTaigaProject: project.value.idTaigaProject,
-    slug: project.value.slug ?? ''
+    description: p.description,
+    active: p.active,
+    idCustomer: p.customer?.idCustomer,
+    projectType: p.projectType,
+    fixed: p.fixed,
+    continuos: p.continuos,
+    fromCyP: p.fromCyP,
+    internal: p.internal,
+    clockifyID: p.clockifyID ?? '',
+    color: p.color ?? '',
+    // Campos fixed — usa as any para acceder sin discriminar union
+    taigaProjectID: (p as any).taigaProjectID ?? undefined,
+    taigaSlug: (p as any).taigaSlug ?? undefined,
+    taigaConfigurationVerificationId: (p as any).taigaConfigurationVerificationId ?? undefined,
+    taigaConfigurationValidationId: (p as any).taigaConfigurationValidationId ?? undefined,
+    plannedQuantityHours: (p as any).plannedQuantityHours ?? undefined,
+    plannedMilestonesPerMonth: (p as any).plannedMilestonesPerMonth ?? undefined,
+    currentBudget: (p as any).currentBudget ?? undefined
   }
 })
 
-const handleSubmit = async (payload: Parameters<typeof updateProject>[1]) => {
+const handleSubmit = async (payload: ProjectFormPayload) => {
   const ok = await updateProject(projectId.value, payload)
   if (ok) {
     await navigateTo('/admin/projects')
@@ -47,7 +63,7 @@ const handleSubmit = async (payload: Parameters<typeof updateProject>[1]) => {
         to="/admin/projects"
         aria-label="Volver al listado"
       />
-      <SectionTitle :title="project ? `Editar — ${project.name}` : 'Editar proyecto'" />
+      <SectionTitle :title="project ? `Editar — ${project.description}` : 'Editar proyecto'" />
     </div>
 
     <!-- Loading -->
