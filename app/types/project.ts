@@ -259,7 +259,7 @@ export type AnyProject = ProjectFixed | ProjectContinuos
 export interface ProjectFormPayload {
   description: string
   active: boolean
-  idCustomer: number
+  customer: { idCustomer: number }
   projectType: number
   fixed: boolean
   continuos: boolean
@@ -267,13 +267,4 @@ export interface ProjectFormPayload {
   internal: boolean
   clockifyID?: string
   color?: string
-  // Campos Taiga — solo aplican cuando fixed = true
-  taigaProjectID?: number | null
-  taigaSlug?: string | null
-  taigaConfigurationVerificationId?: number | null
-  taigaConfigurationValidationId?: number | null
-  // Planificación — solo aplican cuando fixed = true
-  plannedQuantityHours?: number | null
-  plannedMilestonesPerMonth?: number | null
-  currentBudget?: number | null
 }
