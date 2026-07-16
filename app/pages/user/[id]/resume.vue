@@ -20,7 +20,7 @@ const {
 
 watch(() => user.value?.fullname, (name) => {
   if (name) {
-    usePageTitle(`${name} - Resume`)
+    usePageTitle(`${name} - Resume`, 'Resume')
   }
 }, { immediate: true })
 
