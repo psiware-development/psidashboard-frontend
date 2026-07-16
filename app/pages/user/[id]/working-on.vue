@@ -18,7 +18,7 @@ const {
 
 watch(userName, (name) => {
   if (name) {
-    usePageTitle(`${name} - Working on`)
+    usePageTitle(`${name} - Working on`, 'Working on')
   }
 }, { immediate: true })
 

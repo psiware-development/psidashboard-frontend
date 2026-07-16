@@ -86,6 +86,13 @@ const logout = async () => {
             label="Proyectos"
             :is-expanded="isExpanded"
           />
+
+          <AppSidebarLink
+            to="/admin/clients"
+            icon="i-lucide-handshake"
+            label="Clientes"
+            :is-expanded="isExpanded"
+          />
         </div>
       </div>
 
