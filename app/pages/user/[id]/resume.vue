@@ -10,13 +10,11 @@ const {
   kpis,
   projects,
   tasks,
-  timeline,
   plannedHours,
   realHours,
   totalPlannedProjects,
   totalRealProjects,
   totalDifference,
-  showUserNameInTimeline,
   fetchResume
 } = useUserResume(userId)
 
@@ -79,7 +77,7 @@ onMounted(() => {
             </dl>
           </div>
 
-          <div class="lg:col-span-3">
+          <div class="lg:col-span-3 b-0">
             <UCard :ui="{ body: 'text-center py-4' }">
               <p class="text-3xl font-bold">
                 {{ realHours }}/{{ plannedHours }}
@@ -92,31 +90,19 @@ onMounted(() => {
         </div>
       </UCard>
 
-      <HomeKpiGrid
+      <KpiGrid
         :kpis="kpis"
         :loading="loading"
       />
 
-      <div class="grid gap-6 lg:grid-cols-12">
-        <div class="lg:col-span-8">
-          <UserResumeContent
-            :projects="projects"
-            :tasks="tasks"
-            :total-planned="totalPlannedProjects"
-            :total-real="totalRealProjects"
-            :total-difference="totalDifference"
-            :loading="loading"
-          />
-        </div>
-
-        <aside class="lg:col-span-4">
-          <HomeTimeline
-            :items="timeline"
-            :show-user="showUserNameInTimeline"
-            :loading="loading"
-          />
-        </aside>
-      </div>
+      <UserResumeContent
+        :projects="projects"
+        :tasks="tasks"
+        :total-planned="totalPlannedProjects"
+        :total-real="totalRealProjects"
+        :total-difference="totalDifference"
+        :loading="loading"
+      />
     </template>
   </div>
 </template>

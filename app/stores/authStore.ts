@@ -1,29 +1,34 @@
 import { jwtDecode } from 'jwt-decode'
 import type { User, UserRole, UserStatusResponse } from '~/types/user'
 
-const TOKEN_EXPIRATION_KEY = 'psidashboard_expiration_token_session'
 
 function buildUserRoles(user: User): UserRole[] {
-  const roles: UserRole[] = [{ role: 'user' }]
+  const roles: UserRole[] = [{ id: 0, role: 'user' }]
 
   if (user.roleSM) {
-    roles.push({ role: 'sm' })
+    roles.push({ id: 0, role: 'sm' })
   }
 
   if (user.roleAdmin || user.admin) {
-    roles.push({ role: 'admin' })
+    roles.push({ id: 0, role: 'admin' })
   }
 
   return roles
 }
 
 export const useAuthStore = defineStore('auth', {
-  persist: true,
-  state: () => ({
-    accessToken: null as string | null,
-    currentUser: null as User | null,
-    tokenExpiration: null as number | null
-  }),
+  state: () => {
+    const config = useRuntimeConfig()
+    const token = useCookie<string | null>('psidashboard_access_token')
+    const user = useCookie<User | null>('psidashboard_current_user')
+    const expiration = useCookie<number | null>(config.public.tokenExpirationKey)
+
+    return {
+      accessToken: token.value || null,
+      currentUser: user.value || null,
+      tokenExpiration: expiration.value || null
+    }
+  },
   getters: {
     isLoggedIn: state => !!state.currentUser && !!state.accessToken,
     userRoles: (state): UserRoles[] => {
@@ -49,7 +54,8 @@ export const useAuthStore = defineStore('auth', {
         return true
       }
 
-      return this.tokenExpiration < Date.now() / 1000
+      const bufferSeconds = 60
+      return this.tokenExpiration - bufferSeconds < Date.now() / 1000
     },
     setSession(token: string, user: User) {
       const decoded = jwtDecode<{ exp: number }>(token)
@@ -61,18 +67,30 @@ export const useAuthStore = defineStore('auth', {
       }
       this.tokenExpiration = decoded.exp
 
-      if (import.meta.client) {
-        localStorage.setItem(TOKEN_EXPIRATION_KEY, String(decoded.exp))
-      }
+      const maxAge = Math.max(0, decoded.exp - Math.floor(Date.now() / 1000))
+
+      const config = useRuntimeConfig()
+      const tokenCookie = useCookie<string | null>('psidashboard_access_token', { maxAge })
+      const userCookie = useCookie<User | null>('psidashboard_current_user', { maxAge })
+      const expirationCookie = useCookie<number | null>(config.public.tokenExpirationKey, { maxAge })
+
+      tokenCookie.value = token
+      userCookie.value = this.currentUser
+      expirationCookie.value = decoded.exp
     },
     clearSession() {
       this.accessToken = null
       this.currentUser = null
       this.tokenExpiration = null
 
-      if (import.meta.client) {
-        localStorage.removeItem(TOKEN_EXPIRATION_KEY)
-      }
+      const config = useRuntimeConfig()
+      const tokenCookie = useCookie<string | null>('psidashboard_access_token')
+      const userCookie = useCookie<User | null>('psidashboard_current_user')
+      const expirationCookie = useCookie<number | null>(config.public.tokenExpirationKey)
+
+      tokenCookie.value = null
+      userCookie.value = null
+      expirationCookie.value = null
     },
     async login(username: string, password: string) {
       const { $api } = useNuxtApp()
@@ -110,6 +128,10 @@ export const useAuthStore = defineStore('auth', {
           ...user,
           roles: buildUserRoles(user)
         }
+
+        const maxAge = Math.max(0, (this.tokenExpiration || 0) - Math.floor(Date.now() / 1000))
+        const userCookie = useCookie<User | null>('psidashboard_current_user', { maxAge })
+        userCookie.value = this.currentUser
 
         return true
       } catch {
