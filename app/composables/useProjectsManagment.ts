@@ -11,7 +11,7 @@ export const useProjectsManagment = () => {
 
   const search = ref('')
   const filterActive = ref<boolean | undefined>()
-  const filterType = ref<'fixed' | 'continuos' | undefined>()
+  const filterType = ref<number | undefined>()
 
   const filteredProjects = computed(() => {
     return projects.value.filter((p) => {
@@ -23,8 +23,7 @@ export const useProjectsManagment = () => {
         || p.active === filterActive.value
 
       const matchesType = filterType.value === undefined
-        || (filterType.value === 'fixed' && p.fixed)
-        || (filterType.value === 'continuos' && !p.fixed)
+        || p.projectType === filterType.value
 
       return matchesSearch && matchesActive && matchesType
     })
@@ -86,9 +85,27 @@ export const useProjectsManagment = () => {
     }
   }
 
+  const deleting = ref(false)
+
+  const deleteProject = async (id: number): Promise<boolean> => {
+    deleting.value = true
+    try {
+      await $api(`/projects/${id}`, { method: 'DELETE' })
+      projects.value = projects.value.filter(p => p.idProject !== id)
+      toast.add({ title: 'Proyecto eliminado correctamente', color: 'success' })
+      return true
+    } catch {
+      toast.add({ title: 'Error al eliminar el proyecto', color: 'error' })
+      return false
+    } finally {
+      deleting.value = false
+    }
+  }
+
   return {
     loading,
     saving,
+    deleting,
     error,
     projects,
     search,
@@ -98,6 +115,7 @@ export const useProjectsManagment = () => {
     fetchProjects,
     fetchProject,
     createProject,
-    updateProject
+    updateProject,
+    deleteProject
   }
 }
