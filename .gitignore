@@ -29,3 +29,7 @@ coverage/
 # Playwright
 playwright-report/
 test-results/
+
+# Antigravity Agents files
+.agents/
+skills-lock.json
