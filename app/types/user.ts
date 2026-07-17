@@ -1,3 +1,6 @@
+export const ROLE_SCRUM_MASTER = 8
+export const ROLE_OPERATIONS_MANAGER = 12
+
 export interface UserRole {
   id: number
   role: string

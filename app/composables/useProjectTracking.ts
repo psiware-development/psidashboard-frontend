@@ -15,6 +15,7 @@ import {
   getCurrentMonthName,
   getProjectProgress
 } from '~/utils/projectUtils'
+import { canViewUserNamesInTimeline } from '~/utils/userAccess'
 
 export const useProjectTracking = (projectId: MaybeRef<string | number>) => {
   const authStore = useAuthStore()
@@ -74,10 +75,9 @@ export const useProjectTracking = (projectId: MaybeRef<string | number>) => {
 
   const fixedStats = computed(() => projectData.value?.stats ?? null)
 
-  const showUserNameInTimeline = computed(() => {
-    const roleId = authStore.currentUser?.mainRole?.idRole
-    return roleId === 8 || roleId === 12
-  })
+  const showUserNameInTimeline = computed(() =>
+    canViewUserNamesInTimeline(authStore.currentUser)
+  )
 
   const fetchProject = async () => {
     loading.value = true
