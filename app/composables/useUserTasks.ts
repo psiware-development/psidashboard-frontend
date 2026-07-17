@@ -1,13 +1,7 @@
 import type { ActiveUser, UserTaskCase } from '~/types/user'
-import {
-  buildKanbanColumns,
-  formatCaseExpirationDate,
-  kanbanColumns,
-  kanbanStatusMap,
-  mapCaseToKanbanTask,
-  type KanbanColumnTitle,
-  type KanbanTaskItem
-} from '~/utils/userCases'
+import { buildKanbanColumns } from '~/utils/kanban'
+import { kanbanColumns, kanbanStatusMap } from '~/types/kanban'
+import type { KanbanColumnTitle, KanbanTaskItem } from '~/types/kanban'
 import { canAccessUserResource } from '~/utils/userAccess'
 
 export const useUserTasks = (userId: MaybeRef<string | number>) => {

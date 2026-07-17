@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
-import type { KanbanTaskItem } from '~/utils/userCases'
+import type { KanbanTaskItem } from '~/utils/kanban'
 
 const columns = defineModel<Array<{ title: string, tasks: KanbanTaskItem[] }>>('columns', {
   required: true
