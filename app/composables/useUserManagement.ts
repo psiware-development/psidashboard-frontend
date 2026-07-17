@@ -2,20 +2,59 @@ import type { User, UserMainRole, UserFormPayload } from '~/types/user'
 
 export type { User as AdminUser, UserFormPayload as AdminUserFormPayload }
 
+function toUserApiPayload(payload: UserFormPayload, isUpdate: boolean) {
+  return {
+    username: payload.username,
+    fullname: payload.fullname,
+    email: payload.email,
+    // On create always send password; on update only when the field was filled.
+    ...(isUpdate
+      ? (payload.password ? { password: payload.password, passwordConfirm: payload.password } : {})
+      : { password: payload.password }),
+    id_role: payload.idRole,
+    id_taiga_user: payload.idTaigaUser || null,
+    git_hub_login: payload.gitHubLogin || null,
+    role_sm: payload.roleSM ?? false,
+    role_admin: payload.roleAdmin ?? false
+  }
+}
+
 export const useUserManagement = () => {
-  const { $api } = useNuxtApp()
-  const toast = useToast()
+  const filterRoleId = ref<number | undefined>()
 
-  const loading = ref(false)
-  const saving = ref(false)
-  const error = ref<string | null>(null)
-  const users = ref<User[]>([])
+  const list = useList<User>({
+    endpoints: {
+      list: '/users/active',
+      item: '/users',
+      create: '/users'
+    },
+    idField: 'idUser',
+    filterFn: (u, search) => {
+      const matchesSearch = !search
+        || u.fullname?.toLowerCase().includes(search.toLowerCase()) === true
+        || u.username?.toLowerCase().includes(search.toLowerCase()) === true
+        || u.email?.toLowerCase().includes(search.toLowerCase()) === true
 
-  // Roles derivados de los usuarios cargados
+      const matchesRole = filterRoleId.value === undefined
+        || u.mainRole?.idRole === filterRoleId.value
+
+      return matchesSearch && matchesRole
+    },
+    messages: {
+      fetchError: 'No se pudo cargar el listado de usuarios.',
+      createSuccess: 'Usuario creado correctamente.',
+      createError: 'Error al crear el usuario.',
+      updateSuccess: 'Usuario actualizado correctamente.',
+      updateError: 'Error al actualizar el usuario.',
+      deleteSuccess: 'Usuario eliminado.',
+      deleteError: 'Error al eliminar el usuario.'
+    }
+  })
+
   const roles = computed<UserMainRole[]>(() => {
     const seen = new Set<number>()
     const result: UserMainRole[] = []
-    for (const u of users.value) {
+    for (const u of list.items.value) {
       if (u.mainRole && !seen.has(u.mainRole.idRole)) {
         seen.add(u.mainRole.idRole)
         result.push({ idRole: u.mainRole.idRole, description: u.mainRole.description || '' })
@@ -24,124 +63,25 @@ export const useUserManagement = () => {
     return result.sort((a, b) => (a.description || '').localeCompare(b.description || ''))
   })
 
-  const search = ref('')
-  const filterRoleId = ref<number | undefined>()
+  const createUser = (payload: UserFormPayload) =>
+    list.create(toUserApiPayload(payload, false))
 
-  const filteredUsers = computed(() => {
-    return users.value.filter((u) => {
-      const matchesSearch = !search.value
-        || u.fullname?.toLowerCase().includes(search.value.toLowerCase())
-        || u.username?.toLowerCase().includes(search.value.toLowerCase())
-        || u.email?.toLowerCase().includes(search.value.toLowerCase())
-
-      const matchesRole = filterRoleId.value === undefined
-        || u.mainRole?.idRole === filterRoleId.value
-
-      return matchesSearch && matchesRole
-    })
-  })
-
-  const fetchUsers = async () => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await $api<User[]>('/users/active')
-      users.value = response || []
-    } catch {
-      error.value = 'No se pudo cargar el listado de usuarios.'
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const fetchUser = async (id: number): Promise<User | null> => {
-    try {
-      return await $api<User>(`/users/${id}`)
-    } catch {
-      return null
-    }
-  }
-
-  const createUser = async (payload: UserFormPayload): Promise<boolean> => {
-    saving.value = true
-    try {
-      await $api('/users', {
-        method: 'POST',
-        body: {
-          username: payload.username,
-          fullname: payload.fullname,
-          email: payload.email,
-          password: payload.password,
-          id_role: payload.idRole,
-          id_taiga_user: payload.idTaigaUser || null,
-          git_hub_login: payload.gitHubLogin || null,
-          role_sm: payload.roleSM ?? false,
-          role_admin: payload.roleAdmin ?? false
-        }
-      })
-      toast.add({ title: 'Usuario creado correctamente', color: 'success' })
-      return true
-    } catch {
-      toast.add({ title: 'Error al crear el usuario', color: 'error' })
-      return false
-    } finally {
-      saving.value = false
-    }
-  }
-
-  const updateUser = async (id: number, payload: UserFormPayload): Promise<boolean> => {
-    saving.value = true
-    try {
-      await $api(`/users/${id}`, {
-        method: 'PATCH',
-        body: {
-          username: payload.username,
-          fullname: payload.fullname,
-          email: payload.email,
-          ...(payload.password ? { password: payload.password, passwordConfirm: payload.password } : {}),
-          id_role: payload.idRole,
-          id_taiga_user: payload.idTaigaUser || null,
-          git_hub_login: payload.gitHubLogin || null,
-          role_sm: payload.roleSM ?? false,
-          role_admin: payload.roleAdmin ?? false
-        }
-      })
-      toast.add({ title: 'Usuario actualizado correctamente', color: 'success' })
-      return true
-    } catch {
-      toast.add({ title: 'Error al actualizar el usuario', color: 'error' })
-      return false
-    } finally {
-      saving.value = false
-    }
-  }
-
-  const deleteUser = async (id: number): Promise<boolean> => {
-    try {
-      await $api(`/users/${id}`, { method: 'DELETE' })
-      users.value = users.value.filter(u => u.idUser !== id)
-      toast.add({ title: 'Usuario eliminado', color: 'success' })
-      return true
-    } catch {
-      toast.add({ title: 'Error al eliminar el usuario', color: 'error' })
-      return false
-    }
-  }
+  const updateUser = (id: number, payload: UserFormPayload) =>
+    list.update(id, toUserApiPayload(payload, true))
 
   return {
-    loading,
-    saving,
-    error,
-    users,
+    loading: list.loading,
+    saving: list.saving,
+    error: list.error,
+    users: list.items,
     roles,
-    search,
+    search: list.search,
     filterRoleId,
-    filteredUsers,
-    fetchUsers,
-    fetchUser,
+    filteredUsers: list.filteredItems,
+    fetchUsers: list.fetch,
+    fetchUser: list.fetchOne,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser: list.remove
   }
 }

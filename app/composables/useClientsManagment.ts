@@ -1,59 +1,43 @@
 import type { Customer } from '~/types/customer'
 
 export const useClientsManagment = () => {
-  const { $api } = useNuxtApp()
-
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-  const clients = ref<Customer[]>([])
-
-  const search = ref('')
   const filterActive = ref<boolean | undefined>(undefined)
 
-  const filteredClients = computed(() => {
-    let result = clients.value
+  const list = useList<Customer>({
+    endpoints: {
+      list: '/customers',
+      item: '/customers'
+    },
+    idField: 'idCustomer',
+    filterFn: (c, search) => {
+      const matchesSearch = !search
+        || c.corporateName.toLowerCase().includes(search.toLowerCase())
 
-    if (search.value) {
-      const q = search.value.toLowerCase()
-      result = result.filter(c => c.corporateName.toLowerCase().includes(q))
+      const matchesActive = filterActive.value === undefined
+        || c.active === filterActive.value
+
+      return matchesSearch && matchesActive
+    },
+    messages: {
+      fetchError: 'No se pudo cargar el listado de clientes.'
     }
-
-    if (filterActive.value !== undefined) {
-      result = result.filter(c => c.active === filterActive.value)
-    }
-
-    return result
   })
 
-  const fetchClients = async () => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await $api<Customer[]>('/customers')
-      clients.value = response ?? []
-    } catch {
-      error.value = 'No se pudo cargar el listado de clientes.'
-    } finally {
-      loading.value = false
-    }
-  }
-
   const clientOptions = computed(() =>
-    clients.value.map(c => ({
+    list.items.value.map(c => ({
       label: c.corporateName,
       value: c.idCustomer
     }))
   )
 
   return {
-    loading,
-    error,
-    clients,
-    search,
+    loading: list.loading,
+    error: list.error,
+    clients: list.items,
+    search: list.search,
     filterActive,
-    filteredClients,
+    filteredClients: list.filteredItems,
     clientOptions,
-    fetchClients
+    fetchClients: list.fetch
   }
 }
