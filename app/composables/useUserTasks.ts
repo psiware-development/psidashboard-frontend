@@ -2,6 +2,7 @@ import type { ActiveUser, UserTaskCase } from '~/types/user'
 import { buildKanbanColumns } from '~/utils/kanban'
 import { kanbanColumns, kanbanStatusMap } from '~/types/kanban'
 import type { KanbanColumnTitle, KanbanTaskItem } from '~/types/kanban'
+import { toCaseMovePayload, toCaseSavePayload } from '~/utils/casePayload'
 import { canAccessUserResource } from '~/utils/userAccess'
 
 export const useUserTasks = (userId: MaybeRef<string | number>) => {
@@ -67,7 +68,10 @@ export const useUserTasks = (userId: MaybeRef<string | number>) => {
     }
   }
 
-  const moveTask = async (task: KanbanTaskItem, columnTitle: KanbanColumnTitle) => {
+  const moveTask = async (
+    task: KanbanTaskItem,
+    columnTitle: KanbanColumnTitle
+  ) => {
     const status = kanbanStatusMap[columnTitle]
 
     if (!status || task.status === status) {
@@ -86,14 +90,7 @@ export const useUserTasks = (userId: MaybeRef<string | number>) => {
     try {
       await $api(`/cases/${task.id}`, {
         method: 'PATCH',
-        body: {
-          message: task.title,
-          expiration_date: task.date.replace(/-/g, ''),
-          id_project: task.projectId,
-          status,
-          priority: task.priority,
-          severity: task.severity
-        }
+        body: toCaseMovePayload(task, status)
       })
 
       toast.add({
@@ -111,10 +108,18 @@ export const useUserTasks = (userId: MaybeRef<string | number>) => {
     }
   }
 
-  const onDragEnd = async (event: { item?: HTMLElement, to?: HTMLElement, from?: HTMLElement }) => {
+  const onDragEnd = async (event: {
+    item?: HTMLElement
+    to?: HTMLElement
+    from?: HTMLElement
+  }) => {
     const taskId = event.item?.dataset.id
-    const toColumn = event.to?.closest('[data-column]')?.getAttribute('data-column') as KanbanColumnTitle | null
-    const fromColumn = event.from?.closest('[data-column]')?.getAttribute('data-column') as KanbanColumnTitle | null
+    const toColumn = event.to
+      ?.closest('[data-column]')
+      ?.getAttribute('data-column') as KanbanColumnTitle | null
+    const fromColumn = event.from
+      ?.closest('[data-column]')
+      ?.getAttribute('data-column') as KanbanColumnTitle | null
 
     if (!taskId || !toColumn || !fromColumn || toColumn === fromColumn) {
       await fetchTasks()
@@ -165,14 +170,14 @@ export const useUserTasks = (userId: MaybeRef<string | number>) => {
     }
 
     try {
-      const body = {
-        message: payload.description,
-        expiration_date: formatCaseExpirationDate(payload.expirationDate),
-        id_project: payload.projectId,
+      const body = toCaseSavePayload({
+        description: payload.description,
+        projectId: payload.projectId,
         priority: payload.priority,
         severity: payload.severity,
+        expirationDate: payload.expirationDate,
         status: selectedTask.value?.status ?? 1
-      }
+      })
 
       if (selectedTask.value) {
         await $api(`/cases/${selectedTask.value.id}`, {
