@@ -63,7 +63,7 @@ const handleSubmit = async (payload: ProjectFormPayload) => {
         to="/admin/projects"
         aria-label="Volver al listado"
       />
-      <SectionTitle :title="project ? `Editar — ${project.description}` : 'Editar proyecto'" />
+      <SectionTitle title="Editar Proyecto" />
     </div>
 
     <!-- Loading -->

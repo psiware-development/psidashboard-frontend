@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProjectFormPayload } from '~/types/project'
+import type { ProjectFormPayload, TaigaTeamMapPayload } from '~/types/project'
 
 const props = defineProps<{
   mode: 'create' | 'edit'
@@ -13,8 +13,14 @@ const emit = defineEmits<{
 }>()
 
 const { clientOptions, fetchClients } = useClientsManagment()
+const { users, fetchUsers, loading: loadingUsers } = useUserManagement()
 
-onMounted(() => fetchClients())
+onMounted(() => {
+  fetchClients()
+  if (props.mode === 'create') {
+    fetchUsers()
+  }
+})
 
 const projectTypeOptions = [
   { label: 'Fixed', value: 1 },
@@ -32,6 +38,9 @@ const fromCyP = ref(props.initialData?.fromCyP ?? false)
 const internal = ref(props.initialData?.internal ?? false)
 const clockifyID = ref(props.initialData?.clockifyID ?? '')
 const color = ref(props.initialData?.color ?? '#6366f1')
+const initializeTaiga = ref(false)
+const selectedCollaborators = ref<number[]>([])
+const teamMap = ref<TaigaTeamMapPayload>({})
 
 const isValid = computed(() =>
   description.value.trim().length > 0 && idCustomer.value !== undefined
@@ -50,7 +59,14 @@ const submit = () => {
     fromCyP: fromCyP.value,
     internal: internal.value,
     clockifyID: clockifyID.value.trim() || undefined,
-    color: color.value || undefined
+    color: color.value || undefined,
+    initializeTaiga: props.mode === 'create' ? initializeTaiga.value : undefined,
+    collaborators: props.mode === 'create' && initializeTaiga.value && selectedCollaborators.value.length > 0
+      ? selectedCollaborators.value
+      : undefined,
+    teamMap: props.mode === 'create' && initializeTaiga.value && Object.keys(teamMap.value).length > 0
+      ? teamMap.value
+      : undefined
   }
 
   emit('submit', payload)
@@ -149,6 +165,33 @@ const submit = () => {
         v-model="active"
         label="Activo"
       />
+
+      <template v-if="mode === 'create'">
+        <div class="sm:col-span-2 flex items-center justify-between py-2 border-t border-default/40">
+          <div class="space-y-0.5">
+            <label class="text-sm font-medium text-highlighted block">
+              Integración con Taiga
+            </label>
+          </div>
+          <USwitch
+            v-model="initializeTaiga"
+            label="Crear proyecto en Taiga"
+          />
+        </div>
+
+        <div
+          v-if="initializeTaiga"
+          class="sm:col-span-2 pt-2"
+        >
+          <ProjectCollaboratorCarousel
+            :users="users"
+            :selected-user-ids="selectedCollaborators"
+            :loading="loadingUsers"
+            @update:selected-user-ids="selectedCollaborators = $event"
+            @update:team-map="teamMap = $event"
+          />
+        </div>
+      </template>
     </div>
 
     <div class="flex items-center justify-end gap-3 pt-2">
