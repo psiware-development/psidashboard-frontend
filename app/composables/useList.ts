@@ -46,18 +46,18 @@ export function useList<T extends object>(opts: ListOptions<T>) {
     }
   }
 
-  const create = async (payload: unknown): Promise<boolean> => {
+  const create = async (payload: unknown): Promise<T | null> => {
     saving.value = true
     try {
-      await $api(opts.endpoints.create ?? opts.endpoints.item, {
+      const response = await $api<T>(opts.endpoints.create ?? opts.endpoints.item, {
         method: 'POST',
         body: payload as Record<string, unknown>
       })
       toast.add({ title: msg.createSuccess, color: 'success' })
-      return true
+      return response
     } catch {
       toast.add({ title: msg.createError, color: 'error' })
-      return false
+      return null
     } finally {
       saving.value = false
     }
