@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { KanbanTaskItem } from '~/utils/userCases'
-import { formatKanbanDate } from '~/utils/userCases'
+import type { KanbanTaskItem } from '~/utils/kanban'
+import { formatKanbanDate } from '~/utils/kanban'
 
 defineProps<{
   task: KanbanTaskItem

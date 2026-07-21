@@ -1,23 +1,20 @@
 import type { AnyProject, ProjectFormPayload } from '~/types/project'
 
 export const useProjectsManagment = () => {
-  const { $api } = useNuxtApp()
-  const toast = useToast()
-
-  const loading = ref(false)
-  const saving = ref(false)
-  const error = ref<string | null>(null)
-  const projects = ref<AnyProject[]>([])
-
-  const search = ref('')
   const filterActive = ref<boolean | undefined>()
   const filterType = ref<number | undefined>()
 
-  const filteredProjects = computed(() => {
-    return projects.value.filter((p) => {
-      const matchesSearch = !search.value
-        || p.description?.toLowerCase().includes(search.value.toLowerCase())
-        || p.customer?.corporateName?.toLowerCase().includes(search.value.toLowerCase())
+  const list = useList<AnyProject>({
+    endpoints: {
+      list: '/projects/active',
+      item: '/projects',
+      create: '/projects'
+    },
+    idField: 'idProject',
+    filterFn: (p, search) => {
+      const matchesSearch = !search
+        || p.description?.toLowerCase().includes(search.toLowerCase())
+        || p.customer?.corporateName?.toLowerCase().includes(search.toLowerCase())
 
       const matchesActive = filterActive.value === undefined
         || p.active === filterActive.value
@@ -26,96 +23,35 @@ export const useProjectsManagment = () => {
         || p.projectType === filterType.value
 
       return matchesSearch && matchesActive && matchesType
-    })
+    },
+    messages: {
+      fetchError: 'No se pudo cargar el listado de proyectos.',
+      createSuccess: 'Proyecto creado correctamente.',
+      createError: 'Error al crear el proyecto.',
+      updateSuccess: 'Proyecto actualizado correctamente.',
+      updateError: 'Error al actualizar el proyecto.',
+      deleteSuccess: 'Proyecto eliminado correctamente.',
+      deleteError: 'Error al eliminar el proyecto.'
+    }
   })
 
-  const fetchProjects = async () => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await $api<AnyProject[]>('/projects/active')
-      projects.value = response ?? []
-    } catch {
-      error.value = 'No se pudo cargar el listado de proyectos.'
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const fetchProject = async (id: number): Promise<AnyProject | null> => {
-    try {
-      return await $api<AnyProject>(`/projects/${id}`)
-    } catch {
-      return null
-    }
-  }
-
-  const createProject = async (payload: ProjectFormPayload): Promise<boolean> => {
-    saving.value = true
-    try {
-      await $api('/projects', {
-        method: 'POST',
-        body: payload
-      })
-      toast.add({ title: 'Proyecto creado correctamente', color: 'success' })
-      return true
-    } catch {
-      toast.add({ title: 'Error al crear el proyecto', color: 'error' })
-      return false
-    } finally {
-      saving.value = false
-    }
-  }
-
-  const updateProject = async (id: number, payload: ProjectFormPayload): Promise<boolean> => {
-    saving.value = true
-    try {
-      await $api(`/projects/${id}`, {
-        method: 'PATCH',
-        body: payload
-      })
-      toast.add({ title: 'Proyecto actualizado correctamente', color: 'success' })
-      return true
-    } catch {
-      toast.add({ title: 'Error al actualizar el proyecto', color: 'error' })
-      return false
-    } finally {
-      saving.value = false
-    }
-  }
-
-  const deleting = ref(false)
-
-  const deleteProject = async (id: number): Promise<boolean> => {
-    deleting.value = true
-    try {
-      await $api(`/projects/${id}`, { method: 'DELETE' })
-      projects.value = projects.value.filter(p => p.idProject !== id)
-      toast.add({ title: 'Proyecto eliminado correctamente', color: 'success' })
-      return true
-    } catch {
-      toast.add({ title: 'Error al eliminar el proyecto', color: 'error' })
-      return false
-    } finally {
-      deleting.value = false
-    }
-  }
+  const createProject = (payload: ProjectFormPayload) => list.create(payload)
+  const updateProject = (id: number, payload: ProjectFormPayload) => list.update(id, payload)
 
   return {
-    loading,
-    saving,
-    deleting,
-    error,
-    projects,
-    search,
+    loading: list.loading,
+    saving: list.saving,
+    deleting: list.deleting,
+    error: list.error,
+    projects: list.items,
+    search: list.search,
     filterActive,
     filterType,
-    filteredProjects,
-    fetchProjects,
-    fetchProject,
+    filteredProjects: list.filteredItems,
+    fetchProjects: list.fetch,
+    fetchProject: list.fetchOne,
     createProject,
     updateProject,
-    deleteProject
+    deleteProject: list.remove
   }
 }

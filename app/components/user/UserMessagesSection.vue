@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { UserMessage } from '~/types/user'
-import { getMessageProgressColor, getMessageProgressValue } from '~/utils/userCases'
+import { getMessageProgressColor, getMessageProgressValue } from '~/utils/messageStatus'
 
 defineProps<{
   title: string

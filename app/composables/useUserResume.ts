@@ -1,7 +1,7 @@
 import type { KpiItem, TimelineItem } from '~/types/dashboard'
 import type { User, UserResumeData, UserResumeProjectRow, UserResumeTask, UserStatusResponse } from '~/types/user'
 import { buildResumeKpis, buildResumeProjects } from '~/utils/userCases'
-import { canAccessUserResume } from '~/utils/userAccess'
+import { canAccessUserResume, canViewUserNamesInTimeline } from '~/utils/userAccess'
 
 export const useUserResume = (userId: MaybeRef<string | number>) => {
   const authStore = useAuthStore()
@@ -17,10 +17,9 @@ export const useUserResume = (userId: MaybeRef<string | number>) => {
   const tasks = ref<UserResumeTask[]>([])
   const timeline = ref<TimelineItem[]>([])
 
-  const showUserNameInTimeline = computed(() => {
-    const roleId = authStore.currentUser?.mainRole?.idRole
-    return roleId === 8 || roleId === 12
-  })
+  const showUserNameInTimeline = computed(() =>
+    canViewUserNamesInTimeline(authStore.currentUser)
+  )
 
   const plannedHours = computed(() =>
     resume.value?.personal_planification?.total_planned_monthly_hours ?? 0

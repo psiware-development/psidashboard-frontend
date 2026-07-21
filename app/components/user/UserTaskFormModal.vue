@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { KanbanTaskItem } from '~/utils/userCases'
+import type { ActiveUser } from '~/types/user'
+import type { KanbanTaskItem } from '~/utils/kanban'
 
 const open = defineModel<boolean>('open', { default: false })
 

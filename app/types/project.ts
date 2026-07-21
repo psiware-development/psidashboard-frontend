@@ -256,10 +256,18 @@ export interface ProjectContinuos extends Project {
 
 export type AnyProject = ProjectFixed | ProjectContinuos
 
+export type TaigaTeamMapPayload = Record<string, number[]>
+
+export interface InitializeTaigaParams {
+  idProject: number
+  authToken: string
+}
+
 export interface ProjectFormPayload {
   description: string
   active: boolean
   customer: { idCustomer: number }
+  idCustomer: number
   projectType: number
   fixed: boolean
   continuos: boolean
@@ -267,4 +275,7 @@ export interface ProjectFormPayload {
   internal: boolean
   clockifyID?: string
   color?: string
+  initializeTaiga?: boolean
+  collaborators?: number[]
+  teamMap?: TaigaTeamMapPayload
 }

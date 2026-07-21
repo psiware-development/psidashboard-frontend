@@ -51,7 +51,7 @@ const logout = async () => {
         <AppSidebarLink
           :to="`/user/${authenticatedUserId}/resume`"
           icon="i-lucide-file-text"
-          label="Mi resume"
+          label="Mi resumen"
           :is-expanded="isExpanded"
         />
 

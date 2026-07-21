@@ -2,6 +2,7 @@ import type { KpiDescription, KpiItem, TimelineItem, TimelineResponse } from '~/
 import type { HomeProject, UserStatusResponse, WorkingOnItem } from '~/types/user'
 import { buildHomeProjects } from '~/utils/homeProjects'
 import { buildWorkingOnRows } from '~/utils/workingOn'
+import { canViewUserNamesInTimeline } from '~/utils/userAccess'
 
 function buildKpis(
   descriptions?: KpiDescription[],
@@ -31,10 +32,9 @@ export const useHomeData = () => {
   const kpis = ref<KpiItem[]>([])
   const timeline = ref<TimelineItem[]>([])
 
-  const showUserNameInTimeline = computed(() => {
-    const roleId = authStore.currentUser?.mainRole?.idRole
-    return roleId === 8 || roleId === 12
-  })
+  const showUserNameInTimeline = computed(() =>
+    canViewUserNamesInTimeline(authStore.currentUser)
+  )
 
   const fetchHomeData = async () => {
     const userId = authStore.currentUser?.idUser
