@@ -59,12 +59,16 @@ export const useProjectsManagment = () => {
         console.error('Error initializing Taiga project:', taigaError)
         toast.add({
           title: 'Advertencia',
-          description: 'El proyecto se creó, pero no se pudo inicializar en Taiga.',
+          description: 'No se pudo inicializar el proyecto en Taiga.',
           color: 'warning'
         })
       }
 
-      const payloadTeamMap: TaigaTeamMapPayload = teamMap || (collaborators && collaborators.length > 0 ? { team: collaborators } : {})
+      const rawTeamMap: TaigaTeamMapPayload = teamMap || (collaborators && collaborators.length > 0 ? { team: collaborators } : {})
+      const payloadTeamMap: Record<string, string[]> = {}
+      for (const [role, members] of Object.entries(rawTeamMap)) {
+        payloadTeamMap[role] = members.map(id => String(id))
+      }
 
       if (Object.keys(payloadTeamMap).length > 0) {
         try {
@@ -76,7 +80,7 @@ export const useProjectsManagment = () => {
           console.error('Error creating Taiga team:', teamError)
           toast.add({
             title: 'Advertencia',
-            description: 'El proyecto se creó, pero no se pudieron asignar los colaboradores en Taiga.',
+            description: 'No se pudieron asignar los colaboradores en Taiga.',
             color: 'warning'
           })
         }
