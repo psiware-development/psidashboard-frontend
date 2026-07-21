@@ -1,7 +1,6 @@
 import { jwtDecode } from 'jwt-decode'
 import type { User, UserRole, UserStatusResponse } from '~/types/user'
 
-
 function buildUserRoles(user: User): UserRole[] {
   const roles: UserRole[] = [{ id: 0, role: 'user' }]
 
