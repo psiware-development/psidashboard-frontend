@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ProjectWorkingOnRow } from '~/types/project'
 import type { ProjectWorkingOnSort } from '~/utils/projectWorkingOn'
-import type { TableColumn } from '@nuxt/ui'
+import type { AppTableColumn } from '~/components/AppTable.vue'
 
 defineProps<{
   rows: ProjectWorkingOnRow[]
@@ -10,7 +10,7 @@ defineProps<{
 
 const sortBy = defineModel<ProjectWorkingOnSort>('sortBy', { default: 'severity' })
 
-const columns: TableColumn<ProjectWorkingOnRow>[] = [
+const columns: AppTableColumn<ProjectWorkingOnRow>[] = [
   { accessorKey: 'ref', header: 'ID' },
   { accessorKey: 'projectName', header: 'Proyecto' },
   { accessorKey: 'subject', header: 'Descripción' },
@@ -54,72 +54,54 @@ const toggleCreationSort = () => {
       </div>
     </div>
 
-    <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
-      <div
-        v-if="loading"
-        class="p-4 space-y-2"
-      >
-        <USkeleton
-          v-for="index in 5"
-          :key="index"
-          class="h-10"
-        />
-      </div>
+    <AppTable
+      :data="rows"
+      :columns="columns"
+      :loading="loading"
+      empty-icon="i-lucide-list-checks"
+      empty-text="No hay tareas en progreso."
+      class="min-w-[960px]"
+    >
+      <template #ref-cell="{ row }">
+        <a
+          v-if="row.original.link"
+          :href="row.original.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-semibold text-primary hover:underline whitespace-nowrap"
+        >
+          {{ row.original.ref }}
+        </a>
+        <span
+          v-else
+          class="whitespace-nowrap"
+        >{{ row.original.ref }}</span>
+      </template>
 
-      <UTable
-        v-else-if="rows.length > 0"
-        :data="rows"
-        :columns="columns"
-        class="min-w-[960px]"
-      >
-        <template #ref-cell="{ row }">
-          <a
-            v-if="row.original.link"
-            :href="row.original.link"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-semibold text-primary hover:underline whitespace-nowrap"
-          >
-            {{ row.original.ref }}
-          </a>
-          <span
-            v-else
-            class="whitespace-nowrap"
-          >{{ row.original.ref }}</span>
-        </template>
+      <template #projectName-cell="{ row }">
+        <NuxtLink
+          v-if="row.original.projectId"
+          :to="`/project/${row.original.projectId}/working-on`"
+          class="hover:underline"
+        >
+          {{ row.original.projectName }}
+        </NuxtLink>
+        <span v-else>{{ row.original.projectName ?? '-' }}</span>
+      </template>
 
-        <template #projectName-cell="{ row }">
-          <NuxtLink
-            v-if="row.original.projectId"
-            :to="`/project/${row.original.projectId}/working-on`"
-            class="hover:underline"
-          >
-            {{ row.original.projectName }}
-          </NuxtLink>
-          <span v-else>{{ row.original.projectName ?? '-' }}</span>
-        </template>
+      <template #subject-cell="{ row }">
+        <div class="flex items-start gap-2 min-w-[220px]">
+          <SeverityIndicator
+            v-if="row.original.severity"
+            :severity="row.original.severity"
+          />
+          <span class="line-clamp-2">{{ row.original.subject }}</span>
+        </div>
+      </template>
 
-        <template #subject-cell="{ row }">
-          <div class="flex items-start gap-2 min-w-[220px]">
-            <SeverityIndicator
-              v-if="row.original.severity"
-              :severity="row.original.severity"
-            />
-            <span class="line-clamp-2">{{ row.original.subject }}</span>
-          </div>
-        </template>
-
-        <template #status-cell="{ row }">
-          <TaskStatusBadge :status="row.original.status" />
-        </template>
-      </UTable>
-
-      <p
-        v-else
-        class="p-4 text-sm text-muted text-center"
-      >
-        No hay tareas en progreso.
-      </p>
-    </UCard>
+      <template #status-cell="{ row }">
+        <TaskStatusBadge :status="row.original.status" />
+      </template>
+    </AppTable>
   </section>
 </template>
