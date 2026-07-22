@@ -1,19 +1,28 @@
 <script setup lang="ts">
 import type { ProjectUserStoryRow } from '~/types/project'
-import type { TableColumn } from '@nuxt/ui'
+import type { AppTableColumn } from '~/components/AppTable.vue'
 
 defineProps<{
   rows: ProjectUserStoryRow[]
+  loading?: boolean
 }>()
 
-const columns: TableColumn<ProjectUserStoryRow>[] = [
+const columns: AppTableColumn<ProjectUserStoryRow>[] = [
   { accessorKey: 'sprint', header: 'Sprint' },
   { accessorKey: 'subject', header: 'US' },
   { accessorKey: 'status', header: 'Estado' },
   { accessorKey: 'points', header: 'Puntos' },
   { accessorKey: 'realHours', header: 'Horas Reales' },
-  { accessorKey: 'ratio', header: 'Ratio' },
-  { accessorKey: 'assignedUser', header: 'Responsable' }
+  {
+    accessorKey: 'ratio',
+    header: 'Ratio',
+    sortFn: (a, b) => Number(a.ratio.value) - Number(b.ratio.value)
+  },
+  {
+    accessorKey: 'assignedUser',
+    header: 'Responsable',
+    sortFn: (a, b) => (a.assignedUser?.fullname ?? '').localeCompare(b.assignedUser?.fullname ?? '', 'es')
+  }
 ]
 
 const ratioColor = {
@@ -25,9 +34,12 @@ const ratioColor = {
 </script>
 
 <template>
-  <UTable
+  <AppTable
     :data="rows"
     :columns="columns"
+    :loading="loading"
+    empty-icon="i-lucide-file-text"
+    empty-text="No hay historias de usuario registradas."
   >
     <template #sprint-cell="{ row }">
       <a
@@ -77,5 +89,5 @@ const ratioColor = {
       </div>
       <span v-else>-</span>
     </template>
-  </UTable>
+  </AppTable>
 </template>
