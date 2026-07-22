@@ -84,61 +84,60 @@ const handleDelete = async () => {
       />
     </ListFilters>
 
-    <ListTable
+    <AppTable
+      :data="filteredProjects"
+      :columns="[
+        { accessorKey: 'description', header: 'Proyecto' },
+        {
+          accessorKey: 'customer',
+          header: 'Cliente',
+          sortFn: (a, b) => (a.customer?.corporateName ?? '').localeCompare(b.customer?.corporateName ?? '', 'es')
+        },
+        {
+          accessorKey: 'projectType',
+          header: 'Tipo',
+          sortFn: (a, b) => projectTypeBadge(a).label.localeCompare(projectTypeBadge(b).label, 'es')
+        },
+        { accessorKey: 'actions', header: 'Acciones', sortable: false, align: 'right' }
+      ]"
       :loading="loading"
-      :is-empty="filteredProjects.length === 0"
       empty-icon="i-lucide-folder-kanban"
       empty-text="No se encontraron proyectos con esos filtros."
     >
-      <template #headers>
-        <div class="hidden sm:grid grid-cols-[1fr_1fr_1fr_auto] gap-4 px-6 py-2 border-b border-default bg-neutral-50 dark:bg-neutral-800/40">
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Proyecto</span>
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Cliente</span>
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Tipo</span>
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide text-right">Acciones</span>
-        </div>
+      <template #description-cell="{ row }">
+        <p class="text-sm font-medium text-highlighted">
+          {{ row.original.description }}
+        </p>
       </template>
 
-      <div
-        v-for="project in filteredProjects"
-        :key="project.idProject"
-        class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] items-center gap-4 px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
-      >
-        <!-- Proyecto -->
-        <div class="flex items-center gap-3">
-          <p class="text-sm font-medium text-highlighted">
-            {{ project.description }}
-          </p>
-        </div>
+      <template #customer-cell="{ row }">
+        <span
+          class="text-sm font-medium"
+          :class="row.original.internal ? 'text-primary' : 'text-highlighted'"
+        >
+          {{ row.original.customer?.corporateName ?? '—' }}
+        </span>
+      </template>
 
-        <!-- Cliente -->
-        <div>
-          <span
-            class="text-sm font-medium"
-            :class="project.internal ? 'text-primary' : 'text-highlighted'"
-          >
-            {{ project.customer?.corporateName ?? '—' }}
-          </span>
-        </div>
-
-        <!-- Tipo -->
+      <template #projectType-cell="{ row }">
         <div class="flex flex-wrap gap-1.5">
           <UBadge
             variant="subtle"
-            :color="projectTypeBadge(project).color"
-            :label="projectTypeBadge(project).label"
+            :color="projectTypeBadge(row.original).color"
+            :label="projectTypeBadge(row.original).label"
             size="md"
           />
         </div>
+      </template>
 
-        <!-- Acciones -->
-        <div class="flex items-center gap-2">
+      <template #actions-cell="{ row }">
+        <div class="flex items-center justify-end gap-2">
           <UButton
             color="neutral"
             variant="ghost"
             icon="i-lucide-eye"
             size="sm"
-            :to="`/project/${project.idProject}/tracking`"
+            :to="`/project/${row.original.idProject}/tracking`"
             aria-label="Ver proyecto"
           />
           <UButton
@@ -146,7 +145,7 @@ const handleDelete = async () => {
             variant="ghost"
             icon="i-lucide-pencil"
             size="sm"
-            :to="`/admin/projects/${project.idProject}/edit`"
+            :to="`/admin/projects/${row.original.idProject}/edit`"
             aria-label="Editar proyecto"
           />
           <UButton
@@ -155,11 +154,11 @@ const handleDelete = async () => {
             icon="i-lucide-trash-2"
             size="sm"
             aria-label="Eliminar proyecto"
-            @click="confirmDelete(project)"
+            @click="confirmDelete(row.original)"
           />
         </div>
-      </div>
-    </ListTable>
+      </template>
+    </AppTable>
 
     <UModal
       v-model:open="showDeleteConfirm"
