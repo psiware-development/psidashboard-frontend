@@ -14,136 +14,115 @@ defineProps<{
 
 <template>
   <div class="space-y-8">
-    <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
-      <div
-        v-if="loading"
-        class="p-4 space-y-2"
-      >
-        <USkeleton
-          v-for="index in 4"
-          :key="index"
-          class="h-10"
-        />
-      </div>
-
-      <UTable
-        v-else-if="projects.length > 0"
+    <div>
+      <AppTable
         :data="projects"
         :columns="[
           { accessorKey: 'name', header: 'Proyecto' },
           { accessorKey: 'total_planned_monthly_hours', header: 'Horas planificadas' },
           { accessorKey: 'current_real_hours', header: 'Horas reales' },
-          { accessorKey: 'difference', header: 'Diferencia' }
+          {
+            accessorKey: 'difference',
+            header: 'Diferencia',
+            sortFn: (a, b) => (a.total_planned_monthly_hours - a.current_real_hours) - (b.total_planned_monthly_hours - b.current_real_hours)
+          }
         ]"
+        :loading="loading"
+        empty-icon="i-lucide-folder"
+        empty-text="No hay proyectos para mostrar."
         class="min-w-[640px]"
       >
         <template #difference-cell="{ row }">
           {{ row.original.total_planned_monthly_hours - row.original.current_real_hours }}
         </template>
-      </UTable>
-
-      <p
-        v-else
-        class="p-4 text-sm text-muted text-center"
-      >
-        No hay proyectos para mostrar.
-      </p>
+      </AppTable>
 
       <div
         v-if="!loading && projects.length > 0"
-        class="grid grid-cols-4 gap-4 border-t border-default bg-muted/30 px-4 py-3 text-sm font-semibold"
+        class="grid grid-cols-4 gap-4 border-t border-default bg-muted/30 px-4 py-3 text-sm font-semibold rounded-b-lg"
       >
         <span>Total</span>
         <span>{{ totalPlanned }}</span>
         <span>{{ totalReal }}</span>
         <span>{{ totalDifference }}</span>
       </div>
-    </UCard>
+    </div>
 
     <section class="space-y-4">
       <SectionTitle title="Tareas" />
 
-      <UCard :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }">
-        <div
-          v-if="loading"
-          class="p-4 space-y-2"
-        >
-          <USkeleton
-            v-for="index in 4"
-            :key="index"
-            class="h-10"
+      <AppTable
+        :data="tasks"
+        :columns="[
+          {
+            accessorKey: 'project',
+            header: 'Proyecto',
+            sortFn: (a, b) => (a.project?.description ?? '').localeCompare(b.project?.description ?? '', 'es')
+          },
+          {
+            accessorKey: 'taiga',
+            header: 'Taiga',
+            sortFn: (a, b) => (Number(a.userStory?.ref ?? a.issue?.ref ?? 0) - Number(b.userStory?.ref ?? b.issue?.ref ?? 0))
+          },
+          { accessorKey: 'description', header: 'Descripción (Clockify)' },
+          { accessorKey: 'classification', header: 'Clasificación' },
+          { accessorKey: 'realStartDate', header: 'Fecha' },
+          { accessorKey: 'realTime', header: 'Horas' },
+          { accessorKey: 'needRefinement', header: 'Estado' }
+        ]"
+        :loading="loading"
+        empty-icon="i-lucide-list-checks"
+        empty-text="No hay tareas para mostrar."
+        class="min-w-[960px]"
+      >
+        <template #project-cell="{ row }">
+          <NuxtLink
+            v-if="row.original.project?.id"
+            :to="`/project/${row.original.project.id}/tracking`"
+            class="text-primary hover:underline font-medium"
+          >
+            {{ row.original.project.description }}
+          </NuxtLink>
+          <span v-else>{{ row.original.project?.description ?? '-' }}</span>
+        </template>
+
+        <template #taiga-cell="{ row }">
+          <a
+            v-if="row.original.userStory?.link || row.original.issue?.link"
+            :href="row.original.userStory?.link ?? row.original.issue?.link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-primary hover:underline font-semibold"
+          >
+            #{{ row.original.userStory?.ref ?? row.original.issue?.ref }}
+          </a>
+          <span v-else>-</span>
+        </template>
+
+        <template #description-cell="{ row }">
+          {{ row.original.description ?? '-' }}
+        </template>
+
+        <template #classification-cell="{ row }">
+          {{ row.original.classification ?? '-' }}
+        </template>
+
+        <template #realStartDate-cell="{ row }">
+          {{ formatDate(row.original.realStartDate) }}
+        </template>
+
+        <template #realTime-cell="{ row }">
+          {{ row.original.realTime ?? '-' }}
+        </template>
+
+        <template #needRefinement-cell="{ row }">
+          <UIcon
+            :name="row.original.needRefinement ? 'i-lucide-triangle-alert' : 'i-lucide-circle-check'"
+            :class="row.original.needRefinement ? 'text-warning' : 'text-success'"
+            class="size-5"
           />
-        </div>
-
-        <UTable
-          v-else-if="tasks.length > 0"
-          :data="tasks"
-          :columns="[
-            { accessorKey: 'project', header: 'Proyecto' },
-            { accessorKey: 'taiga', header: 'Taiga' },
-            { accessorKey: 'description', header: 'Descripción (Clockify)' },
-            { accessorKey: 'classification', header: 'Clasificación' },
-            { accessorKey: 'date', header: 'Fecha' },
-            { accessorKey: 'hours', header: 'Horas' },
-            { accessorKey: 'status', header: 'Estado' }
-          ]"
-          class="min-w-[960px]"
-        >
-          <template #project-cell="{ row }">
-            <NuxtLink
-              v-if="row.original.project?.id"
-              :to="`/project/${row.original.project.id}/tracking`"
-              class="text-primary hover:underline"
-            >
-              {{ row.original.project.description }}
-            </NuxtLink>
-            <span v-else>{{ row.original.project?.description ?? '-' }}</span>
-          </template>
-
-          <template #taiga-cell="{ row }">
-            <a
-              v-if="row.original.userStory?.link || row.original.issue?.link"
-              :href="row.original.userStory?.link ?? row.original.issue?.link"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-primary hover:underline"
-            >
-              #{{ row.original.userStory?.ref ?? row.original.issue?.ref }}
-            </a>
-            <span v-else>-</span>
-          </template>
-
-          <template #description-cell="{ row }">
-            {{ row.original.description ?? '-' }}
-          </template>
-
-          <template #classification-cell="{ row }">
-            {{ row.original.classification ?? '-' }}
-          </template>
-
-          <template #date-cell="{ row }">
-            {{ formatDate(row.original.realStartDate) }}
-          </template>
-
-          <template #hours-cell="{ row }">
-            {{ row.original.realTime ?? '-' }}
-          </template>
-
-          <template #status-cell="{ row }">
-            <UIcon
-              :name="row.original.needRefinement ? 'i-lucide-triangle-alert' : 'i-lucide-circle-check'"
-              :class="row.original.needRefinement ? 'text-warning' : 'text-success'"
-            />
-          </template>
-        </UTable>
-
-        <p
-          v-else
-          class="p-4 text-sm text-muted text-center"
-        >
-          No hay tareas para mostrar.
-        </p>
-      </UCard>
+        </template>
+      </AppTable>
     </section>
   </div>
 </template>
