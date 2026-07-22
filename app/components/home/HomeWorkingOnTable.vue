@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { WorkingOnRow } from '~/types/dashboard'
-import type { TableColumn } from '@nuxt/ui'
+import type { AppTableColumn } from '~/components/AppTable.vue'
 
 defineProps<{
   rows: WorkingOnRow[]
   loading?: boolean
 }>()
 
-const columns: TableColumn<WorkingOnRow>[] = [
+const columns: AppTableColumn<WorkingOnRow>[] = [
   { accessorKey: 'ref', header: 'Tarea' },
   { accessorKey: 'project', header: 'Proyecto' },
   { accessorKey: 'subject', header: 'Descripción' },
@@ -22,71 +22,51 @@ const columns: TableColumn<WorkingOnRow>[] = [
   <section class="space-y-4">
     <SectionTitle title="Working on" />
 
-    <div
-      v-if="loading"
-      class="space-y-2"
+    <AppTable
+      :data="rows"
+      :columns="columns"
+      :loading="loading"
+      empty-icon="i-lucide-list-checks"
+      empty-text="No tiene tareas en progreso."
     >
-      <USkeleton
-        v-for="index in 5"
-        :key="index"
-        class="h-10 rounded-lg"
-      />
-    </div>
+      <template #ref-cell="{ row }">
+        <a
+          v-if="row.original.link"
+          :href="row.original.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-semibold text-primary hover:underline"
+        >
+          {{ row.original.ref }}
+        </a>
+        <span
+          v-else
+          class="font-semibold text-primary"
+        >
+          {{ row.original.ref }}
+        </span>
+      </template>
 
-    <p
-      v-else-if="rows.length === 0"
-      class="text-center text-sm text-muted"
-    >
-      No tiene tareas en progreso.
-    </p>
+      <template #project-cell="{ row }">
+        <NuxtLink
+          :to="`/project/${row.original.projectId}/tracking`"
+          class="font-semibold text-primary hover:underline"
+        >
+          {{ row.original.project }}
+        </NuxtLink>
+      </template>
 
-    <UCard
-      v-else
-      :ui="{ body: 'p-0 sm:p-0 overflow-x-auto' }"
-    >
-      <UTable
-        :data="rows"
-        :columns="columns"
-      >
-        <template #ref-cell="{ row }">
-          <a
-            v-if="row.original.link"
-            :href="row.original.link"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-semibold text-primary hover:underline"
-          >
-            {{ row.original.ref }}
-          </a>
-          <span
-            v-else
-            class="font-semibold text-primary"
-          >
-            {{ row.original.ref }}
-          </span>
-        </template>
+      <template #subject-cell="{ row }">
+        <span class="line-clamp-2">{{ row.original.subject }}</span>
+      </template>
 
-        <template #project-cell="{ row }">
-          <NuxtLink
-            :to="`/project/${row.original.projectId}/tracking`"
-            class="font-semibold text-primary hover:underline"
-          >
-            {{ row.original.project }}
-          </NuxtLink>
-        </template>
+      <template #severity-cell="{ row }">
+        <SeverityIndicator :severity="row.original.severity" />
+      </template>
 
-        <template #subject-cell="{ row }">
-          <span class="line-clamp-2">{{ row.original.subject }}</span>
-        </template>
-
-        <template #severity-cell="{ row }">
-          <SeverityIndicator :severity="row.original.severity" />
-        </template>
-
-        <template #status-cell="{ row }">
-          <TaskStatusBadge :status="row.original.status" />
-        </template>
-      </UTable>
-    </UCard>
+      <template #status-cell="{ row }">
+        <TaskStatusBadge :status="row.original.status" />
+      </template>
+    </AppTable>
   </section>
 </template>
