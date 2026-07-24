@@ -82,62 +82,62 @@ const handleDelete = async () => {
       />
     </ListFilters>
 
-    <ListTable
+    <AppTable
+      :data="filteredUsers"
+      :columns="[
+        {
+          accessorKey: 'fullname',
+          header: 'Usuario',
+          sortFn: (a, b) => (a.fullname ?? a.username).localeCompare(b.fullname ?? b.username, 'es')
+        },
+        {
+          accessorKey: 'mainRole',
+          header: 'Rol',
+          sortFn: (a, b) => (a.mainRole.description ?? '').localeCompare(b.mainRole.description ?? '', 'es')
+        },
+        { accessorKey: 'permissions', header: 'Permisos', sortable: false },
+        { accessorKey: 'actions', header: 'Acciones', sortable: false, align: 'right' }
+      ]"
       :loading="loading"
-      :is-empty="filteredUsers.length === 0"
       empty-icon="i-lucide-users"
       empty-text="No se encontraron usuarios con esos filtros."
     >
-      <template #headers>
-        <div class="hidden sm:grid grid-cols-[1fr_1fr_1fr_auto] gap-4 px-6 py-2 border-b border-default bg-neutral-50 dark:bg-neutral-800/40">
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Usuario</span>
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Rol</span>
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide">Permisos</span>
-          <span class="text-xs font-semibold text-muted uppercase tracking-wide text-right">Acciones</span>
-        </div>
-      </template>
-
-      <div
-        v-for="user in filteredUsers"
-        :key="user.idUser"
-        class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] items-center gap-4 px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
-      >
-        <!-- Avatar + name -->
+      <template #fullname-cell="{ row }">
         <div class="flex items-center gap-3">
           <UAvatar
-            :src="user.image"
-            :alt="user.fullname ?? user.username"
+            :src="row.original.image"
+            :alt="row.original.fullname ?? row.original.username"
             size="md"
           />
           <div>
             <p class="text-sm font-medium text-highlighted">
-              {{ user.fullname ?? user.username }}
+              {{ row.original.fullname ?? row.original.username }}
             </p>
             <p class="text-xs text-muted">
-              {{ user.email }}
+              {{ row.original.email }}
             </p>
           </div>
         </div>
+      </template>
 
-        <!-- Role -->
-        <div>
-          <span
-            v-if="user.mainRole?.description"
-            class="text-sm font-medium text-highlighted"
-          >
-            {{ user.mainRole?.description }}
-          </span>
-          <span
-            v-else
-            class="text-xs text-muted"
-          >Sin rol</span>
-        </div>
+      <template #mainRole-cell="{ row }">
+        <span
+          v-if="row.original.mainRole.description"
+          class="text-sm font-medium text-highlighted"
+        >
+          {{ row.original.mainRole.description }}
+        </span>
+        <span
+          v-else
+          class="text-xs text-muted"
+        >Sin rol</span>
+      </template>
 
-        <!-- Permissions badges -->
+      <template #permissions-cell="{ row }">
         <div class="flex flex-wrap gap-1.5">
-          <template v-if="getUserPermissions(user).length">
+          <template v-if="getUserPermissions(row.original).length">
             <UBadge
-              v-for="perm in getUserPermissions(user)"
+              v-for="perm in getUserPermissions(row.original)"
               :key="perm.label"
               :color="perm.color"
               variant="subtle"
@@ -150,15 +150,16 @@ const handleDelete = async () => {
             class="text-xs text-muted"
           >—</span>
         </div>
+      </template>
 
-        <!-- Actions -->
-        <div class="flex items-center gap-2">
+      <template #actions-cell="{ row }">
+        <div class="flex items-center justify-end gap-2">
           <UButton
             color="neutral"
             variant="ghost"
             icon="i-lucide-eye"
             size="sm"
-            :to="`/user/${user.idUser}/resume`"
+            :to="`/user/${row.original.idUser}/resume`"
             aria-label="Ver perfil"
           />
           <UButton
@@ -166,7 +167,7 @@ const handleDelete = async () => {
             variant="ghost"
             icon="i-lucide-pencil"
             size="sm"
-            :to="`/admin/users/${user.idUser}/edit`"
+            :to="`/admin/users/${row.original.idUser}/edit`"
             aria-label="Editar usuario"
           />
           <UButton
@@ -175,11 +176,11 @@ const handleDelete = async () => {
             icon="i-lucide-trash-2"
             size="sm"
             aria-label="Eliminar usuario"
-            @click="confirmDelete(user)"
+            @click="confirmDelete(row.original)"
           />
         </div>
-      </div>
-    </ListTable>
+      </template>
+    </AppTable>
 
     <UModal
       v-model:open="showDeleteConfirm"

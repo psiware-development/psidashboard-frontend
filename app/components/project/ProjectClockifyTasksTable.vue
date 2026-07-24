@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import type { ProjectTaskRow } from '~/types/project'
-import type { TableColumn } from '@nuxt/ui'
+import type { AppTableColumn } from '~/components/AppTable.vue'
 
 defineProps<{
   rows: ProjectTaskRow[]
+  loading?: boolean
 }>()
 
-const columns: TableColumn<ProjectTaskRow>[] = [
+const columns: AppTableColumn<ProjectTaskRow>[] = [
   { accessorKey: 'taigaRef', header: 'Taiga' },
   { accessorKey: 'description', header: 'Descripción (Clockify)' },
-  { accessorKey: 'user', header: 'Usuario' },
+  {
+    accessorKey: 'user',
+    header: 'Usuario',
+    sortFn: (a, b) => (a.user?.fullname ?? '').localeCompare(b.user?.fullname ?? '', 'es')
+  },
   { accessorKey: 'classification', header: 'Clasificación' },
   { accessorKey: 'date', header: 'Fecha' },
   { accessorKey: 'hours', header: 'Horas' },
@@ -18,9 +23,12 @@ const columns: TableColumn<ProjectTaskRow>[] = [
 </script>
 
 <template>
-  <UTable
+  <AppTable
     :data="rows"
     :columns="columns"
+    :loading="loading"
+    empty-icon="i-lucide-clock"
+    empty-text="No hay registros de Clockify para este proyecto."
   >
     <template #taigaRef-cell="{ row }">
       <a
@@ -57,5 +65,5 @@ const columns: TableColumn<ProjectTaskRow>[] = [
         class="size-5 mx-auto"
       />
     </template>
-  </UTable>
+  </AppTable>
 </template>
