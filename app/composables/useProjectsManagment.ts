@@ -1,9 +1,8 @@
-import type { AnyProject, ProjectFormPayload, TaigaTeamMapPayload } from '~/types/project'
+import type { AnyProject, ProjectFormPayload } from '~/types/project'
 
 export const useProjectsManagment = () => {
-  const { $api } = useNuxtApp()
-  const authStore = useAuthStore()
   const toast = useToast()
+  const { setupTaigaProject } = useTaigaIntegration()
 
   const filterActive = ref<boolean | undefined>()
   const filterType = ref<number | undefined>()
@@ -70,44 +69,8 @@ export const useProjectsManagment = () => {
       return false
     }
 
-    const idProject = createdProject.idProject
-
     if (initializeTaiga) {
-      const authToken = authStore.accessToken || ''
-      try {
-        await $api(`/projects/${idProject}/initialize-taiga?auth_token=${encodeURIComponent(authToken)}`, {
-          method: 'POST'
-        })
-      } catch (taigaError) {
-        console.error('Error initializing Taiga project:', taigaError)
-        toast.add({
-          title: 'Advertencia',
-          description: 'No se pudo inicializar el proyecto en Taiga.',
-          color: 'warning'
-        })
-      }
-
-      const rawTeamMap: TaigaTeamMapPayload = teamMap || (collaborators && collaborators.length > 0 ? { team: collaborators } : {})
-      const payloadTeamMap: Record<string, string[]> = {}
-      for (const [role, members] of Object.entries(rawTeamMap)) {
-        payloadTeamMap[role] = members.map(id => String(id))
-      }
-
-      if (Object.keys(payloadTeamMap).length > 0) {
-        try {
-          await $api(`/projects/${idProject}/create-team`, {
-            method: 'POST',
-            body: payloadTeamMap
-          })
-        } catch (teamError) {
-          console.error('Error creating Taiga team:', teamError)
-          toast.add({
-            title: 'Advertencia',
-            description: 'No se pudieron asignar los colaboradores en Taiga.',
-            color: 'warning'
-          })
-        }
-      }
+      await setupTaigaProject(createdProject.idProject, { teamMap, collaborators })
     }
 
     return true
