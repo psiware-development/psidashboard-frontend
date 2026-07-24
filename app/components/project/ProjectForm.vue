@@ -14,9 +14,11 @@ const emit = defineEmits<{
 
 const { clientOptions, fetchClients } = useClientsManagment()
 const { users, fetchUsers, loading: loadingUsers } = useUserManagement()
+const { fetchProjects, isProjectNameTaken } = useProjectsManagment()
 
 onMounted(() => {
   fetchClients()
+  fetchProjects()
   if (props.mode === 'create') {
     fetchUsers()
   }
@@ -42,8 +44,19 @@ const initializeTaiga = ref(false)
 const selectedCollaborators = ref<number[]>([])
 const teamMap = ref<TaigaTeamMapPayload>({})
 
+const isNameDuplicate = computed(() => {
+  const name = description.value.trim()
+
+  const initialName = props.initialData?.description?.trim().toLowerCase()
+  if (props.mode === 'edit' && initialName && name.toLowerCase() === initialName) {
+    return false
+  }
+
+  return isProjectNameTaken(name)
+})
+
 const isValid = computed(() =>
-  description.value.trim().length > 0 && idCustomer.value !== undefined
+  description.value.trim().length > 0 && idCustomer.value !== undefined && !isNameDuplicate.value
 )
 
 const submit = () => {
@@ -89,11 +102,13 @@ const submit = () => {
       <UFormField
         label="Nombre"
         required
+        :error="isNameDuplicate ? 'Ya existe un proyecto con este nombre' : undefined"
         class="sm:col-span-2"
       >
         <UInput
           v-model="description"
           placeholder="Ej: Portal de Clientes"
+          :color="isNameDuplicate ? 'error' : undefined"
           class="w-full"
         />
       </UFormField>

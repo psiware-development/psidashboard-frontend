@@ -39,7 +39,30 @@ export const useProjectsManagment = () => {
     }
   })
 
+  const isProjectNameTaken = (name: string, excludeId?: number): boolean => {
+    const normalizeName = name.trim().toLowerCase()
+
+    return list.items.value.some((p) => {
+      if (excludeId !== undefined && p.idProject === excludeId) {
+        return false
+      }
+      return p.description?.trim().toLowerCase() === normalizeName
+    })
+  }
+
   const createProject = async (payload: ProjectFormPayload): Promise<boolean> => {
+    if (list.items.value.length === 0) {
+      await list.fetch()
+    }
+
+    if (isProjectNameTaken(payload.description)) {
+      toast.add({
+        title: 'Ya existe un proyecto con ese nombre.',
+        color: 'error'
+      })
+      return false
+    }
+
     const { initializeTaiga, collaborators, teamMap, ...projectPayload } = payload
 
     const createdProject = await list.create(projectPayload)
@@ -90,7 +113,21 @@ export const useProjectsManagment = () => {
     return true
   }
 
-  const updateProject = (id: number, payload: ProjectFormPayload) => list.update(id, payload)
+  const updateProject = async (id: number, payload: ProjectFormPayload): Promise<boolean> => {
+    if (list.items.value.length === 0) {
+      await list.fetch()
+    }
+
+    if (isProjectNameTaken(payload.description, id)) {
+      toast.add({
+        title: 'Ya existe un proyecto con ese nombre.',
+        color: 'error'
+      })
+      return false
+    }
+
+    return list.update(id, payload)
+  }
 
   return {
     loading: list.loading,
@@ -106,6 +143,7 @@ export const useProjectsManagment = () => {
     fetchProject: list.fetchOne,
     createProject,
     updateProject,
-    deleteProject: list.remove
+    deleteProject: list.remove,
+    isProjectNameTaken
   }
 }
